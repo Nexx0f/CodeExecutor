@@ -379,4 +379,15 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
                 continue;    
           }
     }
+    
+    fclose (inF);
+    return *this;
+}
+
+CodeBlock& CodeBlock::SetBlock (const char* string)
+{
+    FILE* fOut = fopen ("temp.txt", "w");
+    fprintf (fOut, "%s", string);
+    fclose (fOut);
+    return LoadBlock ("temp.txt");
 }
