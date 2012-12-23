@@ -21,13 +21,14 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
     FILE* inF = fopen (fileName, "r");
     bool need = false;
     
+    $ printf ("\n"
+              "Starting to read out block of code\n\n");
+    
     while (!feof (inF))
     {
           char string [256];
           int x = fscanf (inF, "%s", &string);
           if(x <= 0) break;
-          
-          ExecutableCommand* currCmd = execCmds [currentCmdAmount];
           
           if (!strcmp (string, "push"))
           {
@@ -35,8 +36,8 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
                 fscanf (inF, "%d", &number);  
                 $ printf ("push %d\n", number);
                 
-                currCmd = new ExecutableCommand (Commands::PUSH);
-                currCmd -> addIntArg (number);
+                execCmds [currentCmdAmount] = new ExecutableCommand (Commands::PUSH);
+                execCmds [currentCmdAmount] -> addIntArg (number);
                 currentCmdAmount++;
                 
                 continue;    
@@ -46,7 +47,7 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
           {  
                 $ printf ("add\n");
                 
-                currCmd = new ExecutableCommand (Commands::ADD);
+                execCmds [currentCmdAmount] = new ExecutableCommand (Commands::ADD);
                 currentCmdAmount++;
                 
                 continue;    
@@ -56,7 +57,7 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
           {  
                 $ printf ("mul\n");
                 
-                currCmd = new ExecutableCommand (Commands::MUL);
+                execCmds [currentCmdAmount] = new ExecutableCommand (Commands::MUL);
                 currentCmdAmount++;
                 
                 continue;    
@@ -66,7 +67,7 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
           {  
                 $ printf ("sub\n");
                 
-                currCmd = new ExecutableCommand (Commands::SUB);
+                execCmds [currentCmdAmount] = new ExecutableCommand (Commands::SUB);
                 currentCmdAmount++;
                 
                 continue;    
@@ -76,7 +77,7 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
           {  
                 $ printf ("dup\n");
                 
-                currCmd = new ExecutableCommand (Commands::DUP);
+                execCmds [currentCmdAmount] = new ExecutableCommand (Commands::DUP);
                 currentCmdAmount++;
                 
                 continue;    
@@ -85,7 +86,7 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
           {  
                 $ printf ("dump\n");
                 
-                currCmd = new ExecutableCommand (Commands::DUMP);
+                execCmds [currentCmdAmount] = new ExecutableCommand (Commands::DUMP);
                 currentCmdAmount++;
                 
                 continue;    
@@ -95,7 +96,7 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
           {  
                 $ printf ("top\n");
                 
-                currCmd = new ExecutableCommand (Commands::TOP);
+                execCmds [currentCmdAmount] = new ExecutableCommand (Commands::TOP);
                 currentCmdAmount++;
                 
                 continue;    
@@ -105,7 +106,7 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
           {  
                 $ printf ("pop\n");
                 
-                currCmd = new ExecutableCommand (Commands::POP);
+                execCmds [currentCmdAmount] = new ExecutableCommand (Commands::POP);
                 currentCmdAmount++;
                 
                 continue;    
@@ -115,7 +116,7 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
           {  
                 $ printf ("getch\n");
                 
-                currCmd = new ExecutableCommand (Commands::GETCH);
+                execCmds [currentCmdAmount] = new ExecutableCommand (Commands::GETCH);
                 currentCmdAmount++;
                 
                 continue;    
@@ -125,7 +126,7 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
           {  
                 $ printf ("clear\n");
                 
-                currCmd = new ExecutableCommand (Commands::CLEAR);
+                execCmds [currentCmdAmount] = new ExecutableCommand (Commands::CLEAR);
                 currentCmdAmount++;
                 
                 continue;    
@@ -135,7 +136,7 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
           {  
                 $ printf ("cls\n");
                 
-                currCmd = new ExecutableCommand (Commands::CLS);
+                execCmds [currentCmdAmount] = new ExecutableCommand (Commands::CLS);
                 currentCmdAmount++;
                 
                 continue;    
@@ -145,7 +146,7 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
           {  
                 $ printf ("help\n");
                 
-                currCmd = new ExecutableCommand (Commands::HELP);
+                execCmds [currentCmdAmount] = new ExecutableCommand (Commands::HELP);
                 currentCmdAmount++;
                 
                 continue;    
@@ -158,8 +159,8 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
                 fscanf (inF, " %s", &ch); 
                 $ printf ("label %s\n", ch);
                 
-                currCmd = new ExecutableCommand (Commands::LABEL);
-                currCmd -> addStringArg (ch);
+                execCmds [currentCmdAmount] = new ExecutableCommand (Commands::LABEL);
+                execCmds [currentCmdAmount] -> addStringArg (ch);
                 currentCmdAmount++;
                 
                 continue;    
@@ -172,8 +173,8 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
                 fscanf (inF, " %s", &ch); 
                 $ printf ("jump %s\n", ch);
                 
-                currCmd = new ExecutableCommand (Commands::JUMP);
-                currCmd -> addStringArg (ch);
+                execCmds [currentCmdAmount] = new ExecutableCommand (Commands::JUMP);
+                execCmds [currentCmdAmount] -> addStringArg (ch);
                 currentCmdAmount++;
                 
                 continue;    
@@ -185,8 +186,8 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
                 fscanf (inF, " %s", &ch); 
                 $ printf ("jb %s\n", ch);
                 
-                currCmd = new ExecutableCommand (Commands::JB);
-                currCmd -> addStringArg (ch);
+                execCmds [currentCmdAmount] = new ExecutableCommand (Commands::JB);
+                execCmds [currentCmdAmount] -> addStringArg (ch);
                 currentCmdAmount++;
                 
                 continue;    
@@ -198,8 +199,8 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
                 fscanf (inF, " %s", &ch); 
                 $ printf ("ja %s\n", ch);
                 
-                currCmd = new ExecutableCommand (Commands::JA);
-                currCmd -> addStringArg (ch);
+                execCmds [currentCmdAmount] = new ExecutableCommand (Commands::JA);
+                execCmds [currentCmdAmount] -> addStringArg (ch);
                 currentCmdAmount++;
                 
                 continue;    
@@ -211,8 +212,8 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
                 fscanf (inF, " %s", &ch); 
                 $ printf ("jbe %s\n", ch);
                 
-                currCmd = new ExecutableCommand (Commands::JBE);
-                currCmd -> addStringArg (ch);
+                execCmds [currentCmdAmount] = new ExecutableCommand (Commands::JBE);
+                execCmds [currentCmdAmount] -> addStringArg (ch);
                 currentCmdAmount++;
                 
                 continue;    
@@ -224,8 +225,8 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
                 fscanf (inF, " %s", &ch); 
                 $ printf ("jae %s\n", ch);
                 
-                currCmd = new ExecutableCommand (Commands::JAE);
-                currCmd -> addStringArg (ch);
+                execCmds [currentCmdAmount] = new ExecutableCommand (Commands::JAE);
+                execCmds [currentCmdAmount] -> addStringArg (ch);
                 currentCmdAmount++;
                 
                 continue;    
@@ -237,8 +238,8 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
                 fscanf (inF, " %s", &ch); 
                 $ printf ("je %s\n", ch);
                 
-                currCmd = new ExecutableCommand (Commands::JE);
-                currCmd -> addStringArg (ch);
+                execCmds [currentCmdAmount] = new ExecutableCommand (Commands::JE);
+                execCmds [currentCmdAmount] -> addStringArg (ch);
                 currentCmdAmount++;
                 
                 continue;    
@@ -250,8 +251,8 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
                 fscanf (inF, " %s", &ch); 
                 $ printf ("jne %s\n", ch);
                 
-                currCmd = new ExecutableCommand (Commands::JNE);
-                currCmd -> addStringArg (ch);
+                execCmds [currentCmdAmount] = new ExecutableCommand (Commands::JNE);
+                execCmds [currentCmdAmount] -> addStringArg (ch);
                 currentCmdAmount++;
                 
                 continue;    
@@ -263,8 +264,8 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
                 fscanf (inF, " %s", &name);  
                 $ printf ("declare %s\n", name);
                 
-                currCmd = new ExecutableCommand (Commands::DECL);
-                currCmd -> addStringArg (name);
+                execCmds [currentCmdAmount] = new ExecutableCommand (Commands::DECL);
+                execCmds [currentCmdAmount] -> addStringArg (name);
                 currentCmdAmount++;
                 
                 continue;    
@@ -276,8 +277,8 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
                 fscanf (inF, " %s", &name);  
                 $ printf ("popto %s\n", name);
                 
-                currCmd = new ExecutableCommand (Commands::POPTO);
-                currCmd -> addStringArg (name);
+                execCmds [currentCmdAmount] = new ExecutableCommand (Commands::POPTO);
+                execCmds [currentCmdAmount] -> addStringArg (name);
                 currentCmdAmount++;
                 
                 continue;    
@@ -289,8 +290,8 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
                 fscanf (inF, " %s", &name);  
                 $ printf ("pushfrom %s\n", name);
                 
-                currCmd = new ExecutableCommand (Commands::PUSHFROM);
-                currCmd -> addStringArg (name);
+                execCmds [currentCmdAmount] = new ExecutableCommand (Commands::PUSHFROM);
+                execCmds [currentCmdAmount] -> addStringArg (name);
                 currentCmdAmount++;
                 
                 continue;    
@@ -300,7 +301,7 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
           { 
                 $ printf (">=\n");
                 
-                currCmd = new ExecutableCommand (Commands::MOREEQUAL);
+                execCmds [currentCmdAmount] = new ExecutableCommand (Commands::MOREEQUAL);
                 currentCmdAmount++;
                 
                 continue;    
@@ -310,7 +311,7 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
           { 
                 $ printf ("<=\n");
                 
-                currCmd = new ExecutableCommand (Commands::LESSEQUAL);
+                execCmds [currentCmdAmount] = new ExecutableCommand (Commands::LESSEQUAL);
                 currentCmdAmount++;
                 
                 continue;    
@@ -320,7 +321,7 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
           { 
                 $ printf (">\n");
                 
-                currCmd = new ExecutableCommand (Commands::MORE);
+                execCmds [currentCmdAmount] = new ExecutableCommand (Commands::MORE);
                 currentCmdAmount++;
                 
                 continue;    
@@ -330,7 +331,7 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
           { 
                 $ printf ("<\n");
                 
-                currCmd = new ExecutableCommand (Commands::LESS);
+                execCmds [currentCmdAmount] = new ExecutableCommand (Commands::LESS);
                 currentCmdAmount++;
                 
                 continue;    
@@ -340,7 +341,7 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
           { 
                 $ printf ("==\n");
                 
-                currCmd = new ExecutableCommand (Commands::EQUAL);
+                execCmds [currentCmdAmount] = new ExecutableCommand (Commands::EQUAL);
                 currentCmdAmount++;
                 
                 continue;    
@@ -352,8 +353,8 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
                 fscanf (inF, " %s", &ch); 
                 $ printf ("call %s\n", ch);
                 
-                currCmd = new ExecutableCommand (Commands::CALL);
-                currCmd -> addStringArg (ch);
+                execCmds [currentCmdAmount] = new ExecutableCommand (Commands::CALL);
+                execCmds [currentCmdAmount] -> addStringArg (ch);
                 currentCmdAmount++;
                 
                 continue;    
@@ -363,7 +364,7 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
           {  
                 $ printf ("div\n");
                 
-                currCmd = new ExecutableCommand (Commands::DIV);
+                execCmds [currentCmdAmount] = new ExecutableCommand (Commands::DIV);
                 currentCmdAmount++;
                 
                 continue;    
@@ -373,12 +374,14 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
           {  
                 $ printf ("ret\n");
                 
-                currCmd = new ExecutableCommand (Commands::RET);
+                execCmds [currentCmdAmount] = new ExecutableCommand (Commands::RET);
                 currentCmdAmount++;
                 
                 continue;    
           }
     }
+    
+    $ printf ("\n");
     
     fclose (inF);
     return *this;
@@ -391,3 +394,20 @@ CodeBlock& CodeBlock::SetBlock (const char* string)
     fclose (fOut);
     return LoadBlock ("temp.txt");
 }
+
+void CodeBlock::PrepareInformationToExecutor()
+{
+    $ printf ("Commands Amount - %d\n\n"
+              "Starting to translate code into executor language\n\n", currentCmdAmount);
+    
+    FILE* fOut = fopen ("temp.txt", "w");
+    
+    for (int i = 0; i < currentCmdAmount; i++)
+    {
+        execCmds [i] -> printExecuteInformation (fOut);
+    }
+    
+    $ printf ("\n");
+    fclose  (fOut);
+}
+

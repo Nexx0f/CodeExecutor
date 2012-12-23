@@ -14,4 +14,6 @@ public:
                CodeBlock ();
     CodeBlock& LoadBlock (const char* fileName);
     CodeBlock& SetBlock  (const char* string);
+    
+    void PrepareInformationToExecutor ();
 };

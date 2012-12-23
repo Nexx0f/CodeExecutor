@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 const int MAX_ARGS_AMOUNT = 5;
 
 /*CodeBlock create list of executable
@@ -9,15 +11,17 @@ class ExecutableCommand
 public:
     int   cmdNumber;
     
-    int   intArgs           [MAX_ARGS_AMOUNT];
+    int   intArgs                [MAX_ARGS_AMOUNT];
     int   intArgsAmount;
     
-    char* stringArgs        [MAX_ARGS_AMOUNT];
+    char* stringArgs             [MAX_ARGS_AMOUNT];
     int   stringArgsAmount;
     
-          ExecutableCommand (int newCmdNumber);
+          ExecutableCommand      (int newCmdNumber);
          
-    bool  addIntArg         (int newArg);
-    bool  addStringArg      (char* newArg);
+    bool  addIntArg              (int newArg);
+    bool  addStringArg           (char* newArg);
+    
+    bool  printExecuteInformation (FILE* ouF);
 };
  

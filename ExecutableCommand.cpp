@@ -2,6 +2,14 @@
 #include <string.h>
 #include <stdio.h>
 
+#define DEBUG
+
+#ifdef DEBUG
+    #define $ if(true)
+#else
+    #define $ if(false)
+#endif
+
 ExecutableCommand::ExecutableCommand (int newCmdNumber)
 {
     cmdNumber = newCmdNumber;
@@ -32,3 +40,23 @@ bool ExecutableCommand::addStringArg (char* newArg)
     else return false;
 }
 
+bool ExecutableCommand::printExecuteInformation (FILE* ouF)
+{
+    fprintf  (ouF,  "%d", cmdNumber);
+    $ printf ("%d", cmdNumber);
+    
+    for (int i = 0; i < intArgsAmount; i++)
+    {
+        fprintf  (ouF, " %d", intArgs [i]);
+        $ printf (" %d", intArgs [i]);
+    }
+    
+    for (int i = 0; i < stringArgsAmount; i++)
+    {
+        fprintf  (ouF, " %s", stringArgs [i]);
+        $ printf (" %s", stringArgs [i]);
+    }
+    
+    fprintf (ouF, "\n");
+    $ printf ("\n");
+}
