@@ -411,3 +411,11 @@ void CodeBlock::PrepareInformationToExecutor()
     fclose  (fOut);
 }
 
+Executor& CodeBlock::InitExecutor()
+{
+    PrepareInformationToExecutor ();
+    FILE* fIn = fopen ("temp.txt", "r");
+    executor = new Executor (fIn);
+    fclose (fIn);
+    return *executor;
+}
