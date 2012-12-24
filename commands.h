@@ -32,3 +32,26 @@ namespace Commands
     const int CLS         = 201;
     const int HELP        = 202;
 };
+
+
+const int MAX_CMDS_DECLS_ALLOW = 1000;
+
+struct CommandDeclaration
+{
+    char* cmdName;
+    int intArgsAllow;
+    int stringArgsAllow;
+    
+    CommandDeclaration ();
+    CommandDeclaration (const char* newName, int newIntArgsAllow, int newStringArgsAllow);
+};
+
+class LanguageDeclaration
+{
+public:
+    CommandDeclaration* cmdDeclarations [MAX_CMDS_DECLS_ALLOW];
+    
+    LanguageDeclaration ();
+    void DeclareCommands ();
+    void PrintCommandsList ();
+};

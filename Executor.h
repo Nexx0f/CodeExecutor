@@ -1,5 +1,6 @@
 #include "executor-stack_variables.h"
 #include <stdio.h>
+#include "commands.h"
 
 const int MAX_CMD_AMOUNT = 1000;
 
