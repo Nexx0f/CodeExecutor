@@ -7,6 +7,7 @@ class CodeBlock
 {
 private:
     ExecutableCommand* execCmds [MAX_CMD_AMOUNT];
+    LanguageDeclaration languageDeclaration;
     int currentCmdAmount;
     Executor* executor;
     
@@ -16,5 +17,5 @@ public:
     CodeBlock& SetBlock  (const char* string);
     
     void PrepareInformationToExecutor ();
-    Executor& InitExecutor ();
+    Executor& InitExecutor            ();
 };

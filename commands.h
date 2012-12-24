@@ -51,7 +51,9 @@ class LanguageDeclaration
 public:
     CommandDeclaration* cmdDeclarations [MAX_CMDS_DECLS_ALLOW];
     
-    LanguageDeclaration ();
-    void DeclareCommands ();
+    LanguageDeclaration    ();
+    void DeclareCommands   ();
+    int FindCommand        (const char* name);
     void PrintCommandsList ();
 };
+

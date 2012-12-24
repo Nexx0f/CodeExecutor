@@ -65,10 +65,19 @@ void LanguageDeclaration::DeclareCommands ()
 
 void LanguageDeclaration::PrintCommandsList()
 {
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < MAX_CMDS_DECLS_ALLOW; i++)
          if (cmdDeclarations [i] != NULL) printf ("Cmd number - %d; Name - \"%s\"; Args - %d, %d\n",
                                                           i,
                                                           cmdDeclarations [i] -> cmdName,
                                                           cmdDeclarations [i] -> intArgsAllow,
                                                           cmdDeclarations [i] -> stringArgsAllow);
+}
+
+int LanguageDeclaration::FindCommand (const char* name)
+{
+    for (int i = 0; i < MAX_CMDS_DECLS_ALLOW; i++)
+        if (cmdDeclarations [i] != NULL) 
+            if (!strcmp (cmdDeclarations [i] -> cmdName, name))
+                return i;
+    return -1;
 }
