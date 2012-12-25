@@ -6,6 +6,7 @@
 void MessageAboutError (const char* string)
 {
     printf ("\n\n ==Error==>>>>>> %s <<<<<<==Error==", string);
+    assert (0);
 }
 
 VariablesData::VariablesData()
@@ -15,10 +16,8 @@ VariablesData::VariablesData()
          
 void VariablesData::PushVar (Variable newVar)
 {
-    data[currAmountVar] = newVar;
-    if (currAmountVar + 1 >= MAX_VARIABLES_AMOUNT) 
-       MessageAboutError ("Stack data UNDERFLOWNn");
-    else currAmountVar++;
+    data.push_back (newVar);
+    currAmountVar++;
 
 }
 
@@ -51,77 +50,40 @@ void VariablesData::DumpDeclaredVar()
 
 Stack::Stack()
 {
-    size = 0;
-    error_number = 0;
 }   
-
-int Stack::Ok()
-{
-    if (size > MAX_STACK_SIZE)
-    {
-        error_number = OVERFLOWN;
-        return 0;
-    }
-    if (size < 0)
-    {
-        error_number = UNDERFLOWN;
-        return 0;
-    }
-    return !0;            
-    
-}
 
 int Stack::Push (int num)
 {
-    Ok();
-    data[size] = num;
-    size++;
-    assert (Ok());
-    return error_number;
+    data.push_back (num);
 }
     
 int Stack::Pop()
 {
-    Ok();
     int num = 0;
-    size--;
-    num = data[size];
-    assert (Ok());
+    num = data[data.size()-1];
+    
+    if (data.size() == 0)
+        MessageAboutError ("Stack underflown!");
+    
+    data.pop_back();
     return num;
 } 
 
 int Stack::Top()
 {
-    Ok();
     int num = 0;
-    num = data[size-1];
-    Ok();
+    num = data[data.size() - 1];
+
     return num; 
 }
 
 void Stack::Dump()
 {
-    Ok();
-    printf ("Class Stack\nsize = %d, maxsize = %d\n"
-            "{\n    Printing data...\n", size, MAX_STACK_SIZE);
-    for (int i = 0; i < MAX_STACK_SIZE; i++)
+    printf ("Class Stack\nsize = %d"
+            "{\n    Printing data...\n", data.size());
+    for (int i = 0; i < data.size(); i++)
     {
-        if (i <  size) 
-        {  
-            printf ("     *[%d] = %d\n", i, data[i]);
-        }
-        
-        if (i >= size) 
-        {
-            printf ("      [%d] = %d\n", i, data[i]);
-        }
+        printf ("     *[%d] = %d\n", i, data[i]);
     }
     puts ("}");
-    assert (Ok());
-
-}    
-int Stack::GetYourLastError()
-{
-    return error_number;
-
-}    
+}      

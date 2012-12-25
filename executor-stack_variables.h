@@ -1,8 +1,4 @@
-const int MAX_VARIABLES_AMOUNT = 1000;
-const int MAX_STACK_SIZE = 1000;
-
-const int UNDERFLOWN = 1;
-const int OVERFLOWN  = 2;
+#include <vector>
 
 struct Variable
 {
@@ -13,7 +9,7 @@ struct Variable
 class VariablesData
 {
 public:
-    Variable data [MAX_VARIABLES_AMOUNT];
+    std::vector <Variable> data;
     int currAmountVar;
      
     VariablesData ();       
@@ -28,17 +24,12 @@ public:
 class Stack
 {
 public:  
-   int data [MAX_STACK_SIZE];
-   int size;
-   int error_number;
-    
+   std::vector <int> data;
 public:
    Stack                 ();
     
-   int  Ok               ();
    int  Push             (int num);
    int  Pop              (); 
    int  Top              ();
-   void Dump             ();
-   int  GetYourLastError ();   
+   void Dump             ();  
 };

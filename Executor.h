@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "commands.h"
 
-const int MAX_CMD_AMOUNT = 1000;
+const int MAX_DATA_SIZE = 2000;
 
 class Executor
 {
@@ -10,8 +10,8 @@ private:
     VariablesData* varData;
     Stack*         stack;
     Stack         retStack;
-    const char* stringArguments [MAX_CMD_AMOUNT];
-    char  data            [2*MAX_CMD_AMOUNT];
+    std::vector <const char*> stringArguments;
+    char  data            [MAX_DATA_SIZE];
     int   dataSize;
     
 public:  

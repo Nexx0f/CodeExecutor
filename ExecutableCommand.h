@@ -1,6 +1,5 @@
 #include <stdio.h>
-
-const int MAX_ARGS_AMOUNT = 5;
+#include <vector>
 
 /*CodeBlock create list of executable
   commands after parsing input code.
@@ -11,16 +10,14 @@ class ExecutableCommand
 public:
     int   cmdNumber;
     
-    int   intArgs                [MAX_ARGS_AMOUNT];
-    int   intArgsAmount;
+    std::vector <int>   intArgs;
     
-    char* stringArgs             [MAX_ARGS_AMOUNT];
-    int   stringArgsAmount;
+    std::vector <const char*> stringArgs;
     
           ExecutableCommand      (int newCmdNumber);
          
     bool  addIntArg              (int newArg);
-    bool  addStringArg           (char* newArg);
+    bool  addStringArg           (const char* newArg);
     
     bool  printExecuteInformation (FILE* ouF);
 };

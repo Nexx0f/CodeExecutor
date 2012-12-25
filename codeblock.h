@@ -6,7 +6,7 @@
 class CodeBlock
 {
 private:
-    ExecutableCommand* execCmds [MAX_CMD_AMOUNT];
+    std::vector <ExecutableCommand*> execCmds;
     LanguageDeclaration languageDeclaration;
     int currentCmdAmount;
     Executor* executor;

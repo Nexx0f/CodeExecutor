@@ -61,7 +61,7 @@ void Executor::loadFile (FILE* inF)
                char name [256] = ""; 
                fscanf (inF, " %s", &name);
                
-               stringArguments[rStr] = name;               
+               stringArguments.push_back(name);               
                
                data[dataSize] = rStr;
                
@@ -74,7 +74,7 @@ void Executor::loadFile (FILE* inF)
                char name [256] = ""; 
                fscanf (inF, " %s", &name); 
                
-               stringArguments[rStr] = name;
+               stringArguments.push_back(name);
                
                rStr++;             
           }          
@@ -96,20 +96,16 @@ void Executor::Execute()
         //printf ("\ndata[i] = %d i = %d\n", data[i], i);
         if (data[i] == PUSH)
         {
-            stack->Ok ();
             int n = data[i+1];
             stack->Push (n);
             i+=1;
-            stack->Ok();
         }
         
         else
         if (data[i] == LABEL)
         {
-            stack->Ok ();
             i+=1;
             rStr++;
-            stack->Ok();
         } 
         
         else
@@ -122,8 +118,6 @@ void Executor::Execute()
             (data[i] == JNE) ||
             (data[i] == CALL))
         {
-            stack->Ok ();
-            
             char* label = new char [strlen (stringArguments [data[i+1]]) + 1];
             strcpy (label, stringArguments [data[i+1]]);
             i+=1;
@@ -176,203 +170,157 @@ void Executor::Execute()
         //  getch();               
             }
             else {rStr++;}
-                 
-            stack->Ok();
         }               
         else              
         if (data[i] == DUMP)
         {
-            stack->Ok ();
             stack->Dump ();
             i+=1;
-            stack->Ok();
         }
         else
         if (data[i] == ADD)
         {
-            stack->Ok ();
             stack->Push (stack->Pop() + stack->Pop());
             i+=1;
-            stack->Ok();
         }  
         else
         if (data[i] == MUL)
         {
-            stack->Ok ();
             stack->Push (stack->Pop() * stack->Pop());
             i+=1;
-            stack->Ok();
         }  
         else
         if (data[i] == DIV)
         {
-            stack->Ok ();
             stack->Push (stack->Pop() / stack->Pop());
             i+=1;
-            stack->Ok();
         }                     
         else
         if (data[i] == SUB)
         {
-            stack->Ok ();
             stack->Push (stack->Pop() - stack->Pop());
             i+=1;
-            stack->Ok();
         }
         else
         if (data[i] == TOP)
         {
-            stack->Ok ();
             printf ("%d\n", stack->Top());
             i+=1;
-            stack->Ok();
         } 
         else
         if (data[i] == DUP)
         {
-            stack->Ok ();
             stack->Push (stack->Top());
             i+=1;
-            stack->Ok();
         }             
         else
         if (data[i] == HELP)
         {
-            stack->Ok ();
             printf ("HELP IS NOT AVALIBLE IN THIS VERSION =)\n");
             i+=1;
-            stack->Ok();
         } 
         else
         if (data[i] == CLEAR)
         {
-            stack->Ok ();
-            stack->size = 0;
+            stack->data.clear();
             i+=1;
-            stack->Ok();
         }
         else
         if (data[i] == CLS)
         {
-            stack->Ok ();
             for (int i = 0; i < 100; i++) printf ("\n");
             i+=1;
-            stack->Ok();
         }
 
         else
         if (data[i] == POP)
         {
-            stack->Ok ();
             i+=1;
-            stack->Ok();
         }
         
         else
         if (data[i] == GETCH)
         {
-            //using namespace std;
-            stack->Ok ();
-            
             getch();
             
             i+=1;
-            stack->Ok();
         }
         else
         if (data[i] == DECL)
         {
-            stack->Ok ();
             i+=1;
-            stack->Ok();
         }
         else
         if (data[i] == POPTO)
         {
-            stack->Ok ();
             Variable* x = varData -> FindVar (stringArguments[rStr]);
             rStr++;
             x -> value = stack -> Pop(); 
             i+=1;
-            stack->Ok();
         }
         else
         if (data[i] == PUSHFROM)
         {
-            stack->Ok ();
             Variable* x = varData -> FindVar (stringArguments[rStr]);
             rStr++;
             stack -> Push (x -> value);
             i+=1;
-            stack->Ok();
         }                
         else
         if (data[i] == MOREEQUAL)
         {
-            stack->Ok ();
             int i2 = stack -> Pop ();
             int i1 = stack -> Pop ();
             
             if (i1 >= i2) stack -> Push (1);
             else          stack -> Push (0);
             i+=1;
-            stack->Ok();
         }   
         else
         if (data[i] == LESSEQUAL)
         {
-            stack->Ok ();
             int i2 = stack -> Pop ();
             int i1 = stack -> Pop ();
             
             if (i1 <= i2) stack -> Push (1);
             else          stack -> Push (0);
             i+=1;
-            stack->Ok();
         }         
         else
         if (data[i] == MORE)
         {
-            stack->Ok ();
             int i2 = stack -> Pop ();
             int i1 = stack -> Pop ();
             
             if (i1 > i2) stack -> Push (1);
             else          stack -> Push (0);
             i+=1;
-            stack->Ok();
         } 
         else
         if (data[i] == LESS)
         {
-            stack->Ok ();
             int i2 = stack -> Pop ();
             int i1 = stack -> Pop ();
             
             if (i1 < i2)  stack -> Push (1);
             else          stack -> Push (0);
             i+=1;
-            stack->Ok();
         } 
         else
         if (data[i] == EQUAL)
         {
-            stack->Ok ();
             int i2 = stack -> Pop ();
             int i1 = stack -> Pop ();
             
             if (i2 == i1) stack -> Push (1);
             else          stack -> Push (0);
             i+=1;
-            stack->Ok();
         } 
         else
         if (data[i] == RET)
         {
-            stack->Ok();
             i    = retStack.Pop();
-            rStr = retStack.Pop();
-            stack->Ok();        
+            rStr = retStack.Pop();        
         }                                         
         else
         {

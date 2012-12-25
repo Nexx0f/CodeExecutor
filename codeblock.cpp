@@ -42,7 +42,7 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
           
           $ printf ("%s", string);
           
-          execCmds [currentCmdAmount] = new ExecutableCommand (cmd);
+          execCmds.push_back (new ExecutableCommand (cmd));
           
           for (int i = 0; i < languageDeclaration.cmdDeclarations [cmd] -> intArgsAllow; i++)
           {
