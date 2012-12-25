@@ -38,7 +38,7 @@ const int MAX_CMDS_DECLS_ALLOW = 1000;
 
 struct CommandDeclaration
 {
-    char* cmdName;
+   const  char* cmdName;
     int intArgsAllow;
     int stringArgsAllow;
     

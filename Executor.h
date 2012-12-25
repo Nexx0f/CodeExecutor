@@ -10,7 +10,7 @@ private:
     VariablesData* varData;
     Stack*         stack;
     Stack         retStack;
-    char* stringArguments [MAX_CMD_AMOUNT];
+    const char* stringArguments [MAX_CMD_AMOUNT];
     char  data            [2*MAX_CMD_AMOUNT];
     int   dataSize;
     

@@ -6,7 +6,7 @@ const int OVERFLOWN  = 2;
 
 struct Variable
 {
-    char* name;
+    const char* name;
     int value;   
 };
 

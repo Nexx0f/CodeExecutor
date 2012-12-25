@@ -11,8 +11,7 @@ CommandDeclaration::CommandDeclaration()
  
 CommandDeclaration::CommandDeclaration (const char* newName, int newIntArgsAllow, int newStringArgsAllow)
 {
-    cmdName = new char [strlen (newName) + 1];
-    strcpy (cmdName, newName);
+    cmdName = newName;
     
     intArgsAllow = newIntArgsAllow;
     stringArgsAllow = newStringArgsAllow;
@@ -60,7 +59,7 @@ void LanguageDeclaration::DeclareCommands ()
     DECLARE_COMMAND (RET,       "ret",      0, 0);
     DECLARE_COMMAND (CLEAR,     "clear",    0, 0);
     DECLARE_COMMAND (CLS,       ">=",       0, 0);
-    DECLARE_COMMAND (HELP,      ">=",       0, 0);
+    DECLARE_COMMAND (HELP,      "help",     0, 0);
 }
 
 void LanguageDeclaration::PrintCommandsList()

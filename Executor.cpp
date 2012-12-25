@@ -42,8 +42,7 @@ void Executor::loadFile (FILE* inF)
                char name [256] = ""; 
                fscanf (inF, " %s", &name);
                
-               newVar.name = new char [strlen (name) + 1];
-               strcpy (newVar.name, name);
+               newVar.name = name;
                
                varData -> PushVar (newVar);
           }
@@ -62,8 +61,7 @@ void Executor::loadFile (FILE* inF)
                char name [256] = ""; 
                fscanf (inF, " %s", &name);
                
-               stringArguments[rStr] = new char [strlen (name) + 1];
-               strcpy (stringArguments[rStr], name);               
+               stringArguments[rStr] = name;               
                
                data[dataSize] = rStr;
                
@@ -76,8 +74,8 @@ void Executor::loadFile (FILE* inF)
                char name [256] = ""; 
                fscanf (inF, " %s", &name); 
                
-               stringArguments[rStr] = new char [strlen (name) + 1];
-               strcpy (stringArguments[rStr], name);
+               stringArguments[rStr] = name;
+               
                rStr++;             
           }          
           dataSize+=1;
