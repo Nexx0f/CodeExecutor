@@ -5,328 +5,215 @@
 #include <fstream>
 #include <conio.h>
 
-Executor::Executor()
+Executor::Executor (std::vector <ExecutableCommand*> &newCmds): execCmds (newCmds)
 {
     dataSize = 0;
     stack = new Stack;
     varData = new VariablesData;
-}
-
-Executor::Executor (FILE* inF)
-{
-    dataSize = 0;
-    stack = new Stack;
-    varData = new VariablesData;
-    loadFile (inF);
-}
-
-void Executor::loadFile (FILE* inF)
-{
-    using namespace Commands;
-    
-    int rStr = 0;
-    
-    while (!feof (inF))
-    {
-          fscanf (inF, "%d ", &data[dataSize]);
-          dataSize+=1;
-          if ((data[dataSize-1] < 100) &&
-              (data[dataSize-1] != POPTO) &&
-              (data[dataSize-1] != PUSHFROM) &&
-              (data[dataSize-1] != LABEL)) fscanf (inF, "%d", &data[dataSize]);
-          else data[dataSize] = 0;
-          
-          if (data[dataSize-1] == DECL)
-          {
-               Variable newVar;
-               char name [256] = ""; 
-               fscanf (inF, " %s", &name);
-               
-               newVar.name = name;
-               
-               varData -> PushVar (newVar);
-          }
-          
-          
-          if ((data[dataSize-1] == LABEL) ||
-              (data[dataSize-1] == JUMP) ||
-              (data[dataSize-1] == JB) ||
-              (data[dataSize-1] == JA) ||
-              (data[dataSize-1] == JBE) ||
-              (data[dataSize-1] == JAE) ||
-              (data[dataSize-1] == JE) ||
-              (data[dataSize-1] == JNE) ||
-              (data[dataSize-1] == CALL))
-          {
-               char name [256] = ""; 
-               fscanf (inF, " %s", &name);
-               
-               stringArguments.push_back(name);               
-               
-               data[dataSize] = rStr;
-               
-               rStr++;     
-          } 
-              
-          if ((data[dataSize-1] == POPTO) ||
-              (data[dataSize-1] == PUSHFROM))
-          {
-               char name [256] = ""; 
-               fscanf (inF, " %s", &name); 
-               
-               stringArguments.push_back(name);
-               
-               rStr++;             
-          }          
-          dataSize+=1;
-          //printf ("%d %d\n", data[dataSize-2], data[dataSize-1]);
-    }
 }
 
 void Executor::Execute()
 {
     using namespace Commands;
-    int rStr = 0; 
     
     printf ("\nTranslating completed.\n"
             "Starting to execute. Output:\n", dataSize);
     
-    for (int i = 0; i < dataSize; i++)
+    // Declare all variables independently of their places in code. I think it's convenient
+    
+    for (int i = 0; i < execCmds.size(); i++)
     {
-        //printf ("\ndata[i] = %d i = %d\n", data[i], i);
-        if (data[i] == PUSH)
+        if (execCmds [i] -> cmdNumber == DECL)
         {
-            int n = data[i+1];
-            stack->Push (n);
-            i+=1;
+            Variable newVar;
+            newVar.name = execCmds[i] -> stringArgs [0];
+            
+            varData -> PushVar (newVar);
         }
-        
-        else
-        if (data[i] == LABEL)
+    }
+    
+    
+    for (int executingCmd = 0; executingCmd < execCmds.size(); executingCmd++)
+    {
+        if (execCmds [executingCmd] -> cmdNumber == PUSH)
         {
-            i+=1;
-            rStr++;
+            int newDataToPushToStack = execCmds[executingCmd] -> intArgs[0];
+            stack -> Push (newDataToPushToStack);
+        }
+        else
+        if (execCmds [executingCmd] -> cmdNumber == LABEL)
+        {
+            // Nothing to do. Label place will be found during JMP command execution
         } 
-        
         else
-        if ((data[i] == JUMP) ||
-            (data[i] == JB) ||
-            (data[i] == JA) ||
-            (data[i] == JBE) ||
-            (data[i] == JAE) ||
-            (data[i] == JE) ||
-            (data[i] == JNE) ||
-            (data[i] == CALL))
+        if ((execCmds [executingCmd] -> cmdNumber == JUMP) ||
+            (execCmds [executingCmd] -> cmdNumber == JB) ||
+            (execCmds [executingCmd] -> cmdNumber == JA) ||
+            (execCmds [executingCmd] -> cmdNumber == JBE) ||
+            (execCmds [executingCmd] -> cmdNumber == JAE) ||
+            (execCmds [executingCmd] -> cmdNumber == JE) ||
+            (execCmds [executingCmd] -> cmdNumber == JNE) ||
+            (execCmds [executingCmd] -> cmdNumber == CALL))
         {
-            char* label = new char [strlen (stringArguments [data[i+1]]) + 1];
-            strcpy (label, stringArguments [data[i+1]]);
-            i+=1;
+            int numberOfJMPCmd = execCmds [executingCmd] -> cmdNumber;
             
-            int num = 0;
+            int placeOfLabelToJump = -1;
             
-            for (int x = 0; x < dataSize-1; x+=2)
-                 if (data[x] == LABEL && !strcmp (stringArguments [data[x+1]], label)) num = x+2;
+            // Find command LABEL in execution list on which we have to jump
+            
+            for (int i = 0; i < execCmds.size(); i++)
+                 if (execCmds [executingCmd] -> cmdNumber == LABEL &&
+                     !strcmp (execCmds[executingCmd] -> stringArgs[0], execCmds[i] -> stringArgs[0]))
+                     placeOfLabelToJump = i;
+            
+            // If command LABEL was not found - Error!     
                  
-            bool jum = false;
-            
-            if ((data[i-1] == JUMP)) jum = true;
-            else
-            if ((data[i-1] == CALL)) 
-            {
-                jum = true;
-                retStack.Push (rStr+1);
-                retStack.Push (i);
-                
-            }
-            else
-            {
-                int datai  = stack->Pop();
-                int datai1 = stack->Pop();
-            
-                if ((data[i-1] == JB) &&  (datai > datai1)) jum = true;  
-                if ((data[i-1] == JA) &&  (datai < datai1)) jum = true;
-                if ((data[i-1] == JBE) && (datai >= datai1)) jum = true;
-                if ((data[i-1] == JAE) && (datai <= datai1)) jum = true;
-                if ((data[i-1] == JE) &&  (datai == datai1)) jum = true;
-                if ((data[i-1] == JNE) && (datai != datai1)) jum = true;
-            
-                stack->Push (datai1);
-                stack->Push (datai);
-            }
-            
-            if (num == 0) 
+            if (placeOfLabelToJump == -1) 
             {
                     char str[100] = "";
-                    sprintf (str, "Label %s was not found", label);
-                    printf ("\nExecution error:\n======>>>>>>%s<<<<<<======", str);
+                    sprintf (str, "Label %s was not found", execCmds[executingCmd] -> stringArgs[0]);
+                    printf ("\nExecution error:\n======>>>>>> %s <<<<<<======", str);
                     return;
+            }    
+            
+            bool necessityOfJump = false;
+            
+            if (numberOfJMPCmd == JUMP) necessityOfJump = true;
+            else
+            if (numberOfJMPCmd == CALL)
+            {
+                necessityOfJump = true;
+                retStack.Push (executingCmd);
             }
             else
-            if (jum) 
             {
-                     i = num - 1;
-                     rStr = data [i] + 1;
-      //puts ("All good we are jumped...\n");
-        //  getch();               
+                int last = stack -> Pop ();
+                int penultimate = stack -> Pop ();
+                
+                if (numberOfJMPCmd == JB  && (last >  penultimate)) necessityOfJump = true;  
+                if (numberOfJMPCmd == JA  && (last <  penultimate)) necessityOfJump = true;
+                if (numberOfJMPCmd == JBE && (last >= penultimate)) necessityOfJump = true;
+                if (numberOfJMPCmd == JAE && (last <= penultimate)) necessityOfJump = true;
+                if (numberOfJMPCmd == JE  && (last == penultimate)) necessityOfJump = true;
+                if (numberOfJMPCmd == JNE && (last != penultimate)) necessityOfJump = true;
+                           
+                stack -> Push (penultimate);
+                stack -> Push (last);
             }
-            else {rStr++;}
+             
+            if (necessityOfJump) executingCmd = placeOfLabelToJump;
         }               
         else              
-        if (data[i] == DUMP)
+        if (execCmds [executingCmd] -> cmdNumber == DUMP)
         {
-            stack->Dump ();
-            i+=1;
+            stack -> Dump ();
         }
         else
-        if (data[i] == ADD)
+        if (execCmds [executingCmd] -> cmdNumber == ADD)
         {
-            stack->Push (stack->Pop() + stack->Pop());
-            i+=1;
+            stack -> Push (stack->Pop() + stack->Pop());
         }  
         else
-        if (data[i] == MUL)
+        if (execCmds [executingCmd] -> cmdNumber == MUL)
         {
-            stack->Push (stack->Pop() * stack->Pop());
-            i+=1;
+            stack -> Push (stack->Pop() * stack->Pop());
         }  
         else
-        if (data[i] == DIV)
+        if (execCmds [executingCmd] -> cmdNumber == DIV)
         {
-            stack->Push (stack->Pop() / stack->Pop());
-            i+=1;
+            stack -> Push (stack->Pop() / stack->Pop());
         }                     
         else
-        if (data[i] == SUB)
+        if (execCmds [executingCmd] -> cmdNumber == SUB)
         {
-            stack->Push (stack->Pop() - stack->Pop());
-            i+=1;
+            stack -> Push (stack->Pop() - stack->Pop());
         }
         else
-        if (data[i] == TOP)
+        if (execCmds [executingCmd] -> cmdNumber == TOP)
         {
             printf ("%d\n", stack->Top());
-            i+=1;
         } 
         else
-        if (data[i] == DUP)
+        if (execCmds [executingCmd] -> cmdNumber == DUP)
         {
-            stack->Push (stack->Top());
-            i+=1;
+            stack -> Push (stack->Top());
         }             
         else
-        if (data[i] == HELP)
+        if (execCmds [executingCmd] -> cmdNumber == HELP)
         {
-            printf ("HELP IS NOT AVALIBLE IN THIS VERSION =)\n");
-            i+=1;
+            printf ("Help unavalible\n");
         } 
         else
-        if (data[i] == CLEAR)
+        if (execCmds [executingCmd] -> cmdNumber == CLEAR)
         {
-            stack->data.clear();
-            i+=1;
+            stack -> data.clear();
         }
         else
-        if (data[i] == CLS)
+        if (execCmds [executingCmd] -> cmdNumber == CLS)
         {
             for (int i = 0; i < 100; i++) printf ("\n");
-            i+=1;
         }
-
         else
-        if (data[i] == POP)
+        if (execCmds [executingCmd] -> cmdNumber == POP)
         {
-            i+=1;
+            stack -> Pop ();
         }
-        
         else
-        if (data[i] == GETCH)
+        if (execCmds [executingCmd] -> cmdNumber == GETCH)
         {
             getch();
-            
-            i+=1;
         }
         else
-        if (data[i] == DECL)
+        if (execCmds [executingCmd] -> cmdNumber == DECL)
         {
-            i+=1;
+            /* Nothing to do because of all variables were pre-declared during execution
+               independently of their places */
         }
         else
-        if (data[i] == POPTO)
+        if (execCmds [executingCmd] -> cmdNumber == POPTO)
         {
-            Variable* x = varData -> FindVar (stringArguments[rStr]);
-            rStr++;
-            x -> value = stack -> Pop(); 
-            i+=1;
+            Variable* assigningVariable = varData -> FindVar (execCmds[executingCmd] -> stringArgs[0]);
+            assigningVariable -> value  = stack -> Pop(); 
         }
         else
-        if (data[i] == PUSHFROM)
+        if (execCmds [executingCmd] -> cmdNumber == PUSHFROM)
         {
-            Variable* x = varData -> FindVar (stringArguments[rStr]);
-            rStr++;
-            stack -> Push (x -> value);
-            i+=1;
+            Variable* assigningVariable = varData -> FindVar (execCmds[executingCmd] -> stringArgs[0]);
+            stack -> Push (assigningVariable -> value);
         }                
         else
-        if (data[i] == MOREEQUAL)
+        if ((execCmds [executingCmd] -> cmdNumber == MOREEQUAL) ||
+            (execCmds [executingCmd] -> cmdNumber == LESSEQUAL) ||
+            (execCmds [executingCmd] -> cmdNumber == MORE) ||
+            (execCmds [executingCmd] -> cmdNumber == LESS) ||
+            (execCmds [executingCmd] -> cmdNumber == EQUAL))
         {
-            int i2 = stack -> Pop ();
-            int i1 = stack -> Pop ();
+            int last = stack -> Pop ();
+            int penultimate = stack -> Pop ();
             
-            if (i1 >= i2) stack -> Push (1);
-            else          stack -> Push (0);
-            i+=1;
+            int operationResult = 0;
+            
+            if ((execCmds [executingCmd] -> cmdNumber == MOREEQUAL) && penultimate >= last) operationResult = 1;
+            else
+            if ((execCmds [executingCmd] -> cmdNumber == LESSEQUAL) && penultimate <= last) operationResult = 1;    
+            else
+            if ((execCmds [executingCmd] -> cmdNumber == MORE)      && penultimate > last)  operationResult = 1;    
+            else
+            if ((execCmds [executingCmd] -> cmdNumber == LESS)      && penultimate < last)  operationResult = 1;
+            else
+            if ((execCmds [executingCmd] -> cmdNumber == EQUAL)     && penultimate == last) operationResult = 1;    
+                           
+            stack -> Push (operationResult);
         }   
         else
-        if (data[i] == LESSEQUAL)
+        if (execCmds [executingCmd] -> cmdNumber == RET)
         {
-            int i2 = stack -> Pop ();
-            int i1 = stack -> Pop ();
-            
-            if (i1 <= i2) stack -> Push (1);
-            else          stack -> Push (0);
-            i+=1;
-        }         
-        else
-        if (data[i] == MORE)
-        {
-            int i2 = stack -> Pop ();
-            int i1 = stack -> Pop ();
-            
-            if (i1 > i2) stack -> Push (1);
-            else          stack -> Push (0);
-            i+=1;
-        } 
-        else
-        if (data[i] == LESS)
-        {
-            int i2 = stack -> Pop ();
-            int i1 = stack -> Pop ();
-            
-            if (i1 < i2)  stack -> Push (1);
-            else          stack -> Push (0);
-            i+=1;
-        } 
-        else
-        if (data[i] == EQUAL)
-        {
-            int i2 = stack -> Pop ();
-            int i1 = stack -> Pop ();
-            
-            if (i2 == i1) stack -> Push (1);
-            else          stack -> Push (0);
-            i+=1;
-        } 
-        else
-        if (data[i] == RET)
-        {
-            i    = retStack.Pop();
-            rStr = retStack.Pop();        
+            executingCmd = retStack.Pop();        
         }                                         
         else
         {
             char errData [256];
-            sprintf (errData, "Unknown command. Command code - %d."
-                              " Iterator - %d. Size - %d", data[i], i, dataSize);
+            sprintf (errData, "Unknown command. Command code - %d.", execCmds [executingCmd] -> cmdNumber);
             printf ("\nExecution error:\n======>>>>>>%s<<<<<<======", errData);
             return;
         }

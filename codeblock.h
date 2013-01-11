@@ -1,4 +1,3 @@
-#include "ExecutableCommand.h"
 #include "Executor.h"
 
 /*In fact, main project class. It contains control of

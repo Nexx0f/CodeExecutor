@@ -1,6 +1,7 @@
 #include "executor-stack_variables.h"
 #include <stdio.h>
 #include "commands.h"
+#include "ExecutableCommand.h"
 
 const int MAX_DATA_SIZE = 2000;
 
@@ -8,6 +9,7 @@ class Executor
 {
 private:
     VariablesData* varData;
+    std::vector <ExecutableCommand*> &execCmds;
     Stack*         stack;
     Stack         retStack;
     std::vector <const char*> stringArguments;
@@ -15,10 +17,7 @@ private:
     int   dataSize;
     
 public:  
-         Executor ();
-         Executor (FILE* inF);
-    
-    void loadFile (FILE* inF);
+         Executor (std::vector <ExecutableCommand*> &newCmds);
          
     void Execute  ();
 };

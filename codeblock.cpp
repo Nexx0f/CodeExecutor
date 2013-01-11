@@ -83,27 +83,8 @@ CodeBlock& CodeBlock::SetBlock (const char* string)
     return LoadBlock ("temp.txt");
 }
 
-void CodeBlock::PrepareInformationToExecutor()
-{
-    $ printf ("Commands Amount - %d\n\n"
-              "Starting to translate code into executor language\n\n", currentCmdAmount);
-    
-    FILE* fOut = fopen ("temp.txt", "w");
-    
-    for (int i = 0; i < currentCmdAmount; i++)
-    {
-        execCmds [i] -> printExecuteInformation (fOut);
-    }
-    
-    $ printf ("\n");
-    fclose  (fOut);
-}
-
 Executor& CodeBlock::InitExecutor()
 {
-    PrepareInformationToExecutor ();
-    FILE* fIn = fopen ("temp.txt", "r");
-    executor = new Executor (fIn);
-    fclose (fIn);
+    executor = new Executor (execCmds);
     return *executor;
 }
