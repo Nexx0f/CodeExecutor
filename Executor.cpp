@@ -7,23 +7,256 @@
 
 Executor::Executor (std::vector <ExecutableCommand*> &newCmds): execCmds (newCmds)
 {
-    dataSize = 0;
+    executingCmd = 0;
     stack = new Stack;
     varData = new VariablesData;
 }
 
-void Executor::Execute()
+bool Executor::Push ()
 {
-    using namespace Commands;
+    int newDataToPushToStack = execCmds[executingCmd] -> intArgs[0];
+    stack -> Push (newDataToPushToStack);
+}
+
+bool Executor::Label ()
+{
+    // Nothing to do. Label place will be found during JMP command execution
+}
+
+bool Executor::Jmp ()
+{
+    JumpCommands ();
+}
+
+bool Executor::Jb ()
+{
+    JumpCommands ();
+}
+
+bool Executor::Ja ()
+{
+    JumpCommands ();
+}
+
+bool Executor::Jae ()
+{
+    JumpCommands ();
+}
+
+bool Executor::Jbe ()
+{
+    JumpCommands ();
+}
+
+bool Executor::Je ()
+{
+    JumpCommands ();
+}
+
+bool Executor::Jne ()
+{
+    JumpCommands ();
+}
+
+bool Executor::Call ()
+{
+    JumpCommands ();
+}
+
+bool Executor::JumpCommands ()
+{
+    if ((execCmds [executingCmd] -> cmdNumber == Commands::JUMP) ||
+        (execCmds [executingCmd] -> cmdNumber == Commands::JB) ||
+        (execCmds [executingCmd] -> cmdNumber == Commands::JA) ||
+        (execCmds [executingCmd] -> cmdNumber == Commands::JBE) ||
+        (execCmds [executingCmd] -> cmdNumber == Commands::JAE) ||
+        (execCmds [executingCmd] -> cmdNumber == Commands::JE) ||
+        (execCmds [executingCmd] -> cmdNumber == Commands::JNE) ||
+        (execCmds [executingCmd] -> cmdNumber == Commands::CALL))
+    {
+        int numberOfJMPCmd = execCmds [executingCmd] -> cmdNumber;
+        
+        int placeOfLabelToJump = -1;
+        
+        // Find command LABEL in execution list on which we have to jump
+        
+        for (int i = 0; i < execCmds.size(); i++)
+                if (execCmds [executingCmd] -> cmdNumber == Commands::LABEL &&
+                    !strcmp (execCmds[executingCmd] -> stringArgs[0], execCmds[i] -> stringArgs[0]))
+                    placeOfLabelToJump = i;
+        
+        // If command LABEL was not found - Error!     
+                
+        if (placeOfLabelToJump == -1) 
+        {
+                char str[100] = "";
+                sprintf (str, "Label %s was not found", execCmds[executingCmd] -> stringArgs[0]);
+                printf ("\nExecution error:\n======>>>>>> %s <<<<<<======", str);
+                return false;
+        }    
+        
+        bool necessityOfJump = false;
+        
+        if (numberOfJMPCmd == Commands::JUMP) necessityOfJump = true;
+        else
+        if (numberOfJMPCmd == Commands::CALL)
+        {
+            necessityOfJump = true;
+            retStack.Push (executingCmd);
+        }
+        else
+        {
+            int last = stack -> Pop ();
+            int penultimate = stack -> Pop ();
+            
+            if (numberOfJMPCmd == Commands::JB  && (last >  penultimate)) necessityOfJump = true;  
+            if (numberOfJMPCmd == Commands::JA  && (last <  penultimate)) necessityOfJump = true;
+            if (numberOfJMPCmd == Commands::JBE && (last >= penultimate)) necessityOfJump = true;
+            if (numberOfJMPCmd == Commands::JAE && (last <= penultimate)) necessityOfJump = true;
+            if (numberOfJMPCmd == Commands::JE  && (last == penultimate)) necessityOfJump = true;
+            if (numberOfJMPCmd == Commands::JNE && (last != penultimate)) necessityOfJump = true;
+                        
+            stack -> Push (penultimate);
+            stack -> Push (last);
+        }
+            
+        if (necessityOfJump) executingCmd = placeOfLabelToJump;   
+    }
+}  
+
+bool Executor::Dump ()
+{
+    stack -> Dump ();
+} 
+
+bool Executor::Add ()
+{
+    stack -> Push (stack->Pop() + stack->Pop());
+} 
+
+bool Executor::Sub ()
+{
+    stack -> Push (stack->Pop() - stack->Pop());
+} 
+
+bool Executor::Mul ()
+{
+    stack -> Push (stack->Pop() * stack->Pop());
+} 
+
+bool Executor::Div ()
+{
+    stack -> Push (stack->Pop() / stack->Pop());
+} 
+
+bool Executor::Top ()
+{
+    printf ("%d\n", stack->Top());
+} 
+
+bool Executor::Dup ()
+{
+    stack -> Push (stack->Top());
+} 
+
+bool Executor::Help ()
+{
+    printf ("Help unavalible\n");
+} 
+
+bool Executor::Clear ()
+{
+    stack -> data.clear();
+}
+
+bool Executor::Cls ()
+{
+    for (int i = 0; i < 100; i++) printf ("\n");
+}
+
+bool Executor::Pop ()
+{
+    stack -> Pop ();
+}
+
+bool Executor::Getch ()
+{
+    getch();
+}
+
+bool Executor::Decl ()
+{
+    /* Nothing to do because of all variables were pre-declared during execution
+        independently of their places */
+}
+
+bool Executor::Popto ()
+{
+    Variable* assigningVariable = varData -> FindVar (execCmds[executingCmd] -> stringArgs[0]);
+    assigningVariable -> value  = stack -> Pop(); 
+} 
+
+bool Executor::Pushfrom ()
+{
+    Variable* assigningVariable = varData -> FindVar (execCmds[executingCmd] -> stringArgs[0]);
+    stack -> Push (assigningVariable -> value);
+} 
+
+bool Executor::Moreequal ()
+{
+    ComparisonCommands ();
+} 
+
+bool Executor::Lessequal ()
+{
+    ComparisonCommands ();
+} 
+
+bool Executor::More ()
+{
+    ComparisonCommands ();
+} 
+
+bool Executor::Less ()
+{
+    ComparisonCommands ();
+} 
+
+bool Executor::Equal ()
+{
+    ComparisonCommands ();
+} 
+
+bool Executor::ComparisonCommands ()
+{
+    int last = stack -> Pop ();
+    int penultimate = stack -> Pop ();
     
-    printf ("\nTranslating completed.\n"
-            "Starting to execute. Output:\n", dataSize);
+    int operationResult = 0;
     
-    // Declare all variables independently of their places in code. I think it's convenient
-    
+    if ((execCmds [executingCmd] -> cmdNumber == Commands::MOREEQUAL) && penultimate >= last) operationResult = 1;
+    else
+    if ((execCmds [executingCmd] -> cmdNumber == Commands::LESSEQUAL) && penultimate <= last) operationResult = 1;    
+    else
+    if ((execCmds [executingCmd] -> cmdNumber == Commands::MORE)      && penultimate > last)  operationResult = 1;    
+    else
+    if ((execCmds [executingCmd] -> cmdNumber == Commands::LESS)      && penultimate < last)  operationResult = 1;
+    else
+    if ((execCmds [executingCmd] -> cmdNumber == Commands::EQUAL)     && penultimate == last) operationResult = 1;    
+                    
+    stack -> Push (operationResult);    
+} 
+
+bool Executor::Ret ()
+{
+    executingCmd = retStack.Pop();
+} 
+
+bool Executor::DeclareAllVariables ()
+{
     for (int i = 0; i < execCmds.size(); i++)
     {
-        if (execCmds [i] -> cmdNumber == DECL)
+        if (execCmds [i] -> cmdNumber == Commands::DECL)
         {
             Variable newVar;
             newVar.name = execCmds[i] -> stringArgs [0];
@@ -31,185 +264,82 @@ void Executor::Execute()
             varData -> PushVar (newVar);
         }
     }
+}
+
+void Executor::Execute()
+{
+    using namespace Commands;
     
+    printf ("\nTranslating completed.\n"
+            "Starting to execute. Output:\n");
     
-    for (int executingCmd = 0; executingCmd < execCmds.size(); executingCmd++)
+    // Declare all variables independently of their places in code. I think it's convenient
+    
+    DeclareAllVariables ();
+    
+    while (executingCmd < execCmds.size())
     {
-        if (execCmds [executingCmd] -> cmdNumber == PUSH)
-        {
-            int newDataToPushToStack = execCmds[executingCmd] -> intArgs[0];
-            stack -> Push (newDataToPushToStack);
-        }
+        if (execCmds [executingCmd] -> cmdNumber == PUSH)      Push      ();
+        else 
+        if (execCmds [executingCmd] -> cmdNumber == LABEL)     Label     ();
         else
-        if (execCmds [executingCmd] -> cmdNumber == LABEL)
-        {
-            // Nothing to do. Label place will be found during JMP command execution
-        } 
+        if (execCmds [executingCmd] -> cmdNumber == JUMP)      Jmp       ();
         else
-        if ((execCmds [executingCmd] -> cmdNumber == JUMP) ||
-            (execCmds [executingCmd] -> cmdNumber == JB) ||
-            (execCmds [executingCmd] -> cmdNumber == JA) ||
-            (execCmds [executingCmd] -> cmdNumber == JBE) ||
-            (execCmds [executingCmd] -> cmdNumber == JAE) ||
-            (execCmds [executingCmd] -> cmdNumber == JE) ||
-            (execCmds [executingCmd] -> cmdNumber == JNE) ||
-            (execCmds [executingCmd] -> cmdNumber == CALL))
-        {
-            int numberOfJMPCmd = execCmds [executingCmd] -> cmdNumber;
-            
-            int placeOfLabelToJump = -1;
-            
-            // Find command LABEL in execution list on which we have to jump
-            
-            for (int i = 0; i < execCmds.size(); i++)
-                 if (execCmds [executingCmd] -> cmdNumber == LABEL &&
-                     !strcmp (execCmds[executingCmd] -> stringArgs[0], execCmds[i] -> stringArgs[0]))
-                     placeOfLabelToJump = i;
-            
-            // If command LABEL was not found - Error!     
-                 
-            if (placeOfLabelToJump == -1) 
-            {
-                    char str[100] = "";
-                    sprintf (str, "Label %s was not found", execCmds[executingCmd] -> stringArgs[0]);
-                    printf ("\nExecution error:\n======>>>>>> %s <<<<<<======", str);
-                    return;
-            }    
-            
-            bool necessityOfJump = false;
-            
-            if (numberOfJMPCmd == JUMP) necessityOfJump = true;
-            else
-            if (numberOfJMPCmd == CALL)
-            {
-                necessityOfJump = true;
-                retStack.Push (executingCmd);
-            }
-            else
-            {
-                int last = stack -> Pop ();
-                int penultimate = stack -> Pop ();
-                
-                if (numberOfJMPCmd == JB  && (last >  penultimate)) necessityOfJump = true;  
-                if (numberOfJMPCmd == JA  && (last <  penultimate)) necessityOfJump = true;
-                if (numberOfJMPCmd == JBE && (last >= penultimate)) necessityOfJump = true;
-                if (numberOfJMPCmd == JAE && (last <= penultimate)) necessityOfJump = true;
-                if (numberOfJMPCmd == JE  && (last == penultimate)) necessityOfJump = true;
-                if (numberOfJMPCmd == JNE && (last != penultimate)) necessityOfJump = true;
-                           
-                stack -> Push (penultimate);
-                stack -> Push (last);
-            }
-             
-            if (necessityOfJump) executingCmd = placeOfLabelToJump;
-        }               
+        if (execCmds [executingCmd] -> cmdNumber == JB)        Jb        ();
+        else
+        if (execCmds [executingCmd] -> cmdNumber == JA)        Ja        ();
+        else
+        if (execCmds [executingCmd] -> cmdNumber == JBE)       Jbe       ();
+        else
+        if (execCmds [executingCmd] -> cmdNumber == JAE)       Jae       ();
+        else
+        if (execCmds [executingCmd] -> cmdNumber == JE)        Je        ();
+        else 
+        if (execCmds [executingCmd] -> cmdNumber == JNE)       Jne       ();
+        else
+        if (execCmds [executingCmd] -> cmdNumber == CALL)      Call      ();   
         else              
-        if (execCmds [executingCmd] -> cmdNumber == DUMP)
-        {
-            stack -> Dump ();
-        }
+        if (execCmds [executingCmd] -> cmdNumber == DUMP)      Dump      ();
         else
-        if (execCmds [executingCmd] -> cmdNumber == ADD)
-        {
-            stack -> Push (stack->Pop() + stack->Pop());
-        }  
+        if (execCmds [executingCmd] -> cmdNumber == ADD)       Add       ();
         else
-        if (execCmds [executingCmd] -> cmdNumber == MUL)
-        {
-            stack -> Push (stack->Pop() * stack->Pop());
-        }  
+        if (execCmds [executingCmd] -> cmdNumber == MUL)       Mul       ();
         else
-        if (execCmds [executingCmd] -> cmdNumber == DIV)
-        {
-            stack -> Push (stack->Pop() / stack->Pop());
-        }                     
+        if (execCmds [executingCmd] -> cmdNumber == DIV)       Div       ();                     
         else
-        if (execCmds [executingCmd] -> cmdNumber == SUB)
-        {
-            stack -> Push (stack->Pop() - stack->Pop());
-        }
+        if (execCmds [executingCmd] -> cmdNumber == SUB)       Sub       ();
         else
-        if (execCmds [executingCmd] -> cmdNumber == TOP)
-        {
-            printf ("%d\n", stack->Top());
-        } 
+        if (execCmds [executingCmd] -> cmdNumber == TOP)       Top       ();
         else
-        if (execCmds [executingCmd] -> cmdNumber == DUP)
-        {
-            stack -> Push (stack->Top());
-        }             
+        if (execCmds [executingCmd] -> cmdNumber == DUP)       Dup       ();            
         else
-        if (execCmds [executingCmd] -> cmdNumber == HELP)
-        {
-            printf ("Help unavalible\n");
-        } 
+        if (execCmds [executingCmd] -> cmdNumber == HELP)      Help      ();
         else
-        if (execCmds [executingCmd] -> cmdNumber == CLEAR)
-        {
-            stack -> data.clear();
-        }
+        if (execCmds [executingCmd] -> cmdNumber == CLEAR)     Clear     ();
         else
-        if (execCmds [executingCmd] -> cmdNumber == CLS)
-        {
-            for (int i = 0; i < 100; i++) printf ("\n");
-        }
+        if (execCmds [executingCmd] -> cmdNumber == CLS)       Cls       ();
+        else   
+        if (execCmds [executingCmd] -> cmdNumber == POP)       Pop       ();
         else
-        if (execCmds [executingCmd] -> cmdNumber == POP)
-        {
-            stack -> Pop ();
-        }
+        if (execCmds [executingCmd] -> cmdNumber == GETCH)     Getch     ();
         else
-        if (execCmds [executingCmd] -> cmdNumber == GETCH)
-        {
-            getch();
-        }
+        if (execCmds [executingCmd] -> cmdNumber == DECL)      Decl      ();
         else
-        if (execCmds [executingCmd] -> cmdNumber == DECL)
-        {
-            /* Nothing to do because of all variables were pre-declared during execution
-               independently of their places */
-        }
+        if (execCmds [executingCmd] -> cmdNumber == POPTO)     Popto     ();
         else
-        if (execCmds [executingCmd] -> cmdNumber == POPTO)
-        {
-            Variable* assigningVariable = varData -> FindVar (execCmds[executingCmd] -> stringArgs[0]);
-            assigningVariable -> value  = stack -> Pop(); 
-        }
+        if (execCmds [executingCmd] -> cmdNumber == PUSHFROM)  Pushfrom  ();             
         else
-        if (execCmds [executingCmd] -> cmdNumber == PUSHFROM)
-        {
-            Variable* assigningVariable = varData -> FindVar (execCmds[executingCmd] -> stringArgs[0]);
-            stack -> Push (assigningVariable -> value);
-        }                
+        if (execCmds [executingCmd] -> cmdNumber == MOREEQUAL) Moreequal ();
         else
-        if ((execCmds [executingCmd] -> cmdNumber == MOREEQUAL) ||
-            (execCmds [executingCmd] -> cmdNumber == LESSEQUAL) ||
-            (execCmds [executingCmd] -> cmdNumber == MORE) ||
-            (execCmds [executingCmd] -> cmdNumber == LESS) ||
-            (execCmds [executingCmd] -> cmdNumber == EQUAL))
-        {
-            int last = stack -> Pop ();
-            int penultimate = stack -> Pop ();
-            
-            int operationResult = 0;
-            
-            if ((execCmds [executingCmd] -> cmdNumber == MOREEQUAL) && penultimate >= last) operationResult = 1;
-            else
-            if ((execCmds [executingCmd] -> cmdNumber == LESSEQUAL) && penultimate <= last) operationResult = 1;    
-            else
-            if ((execCmds [executingCmd] -> cmdNumber == MORE)      && penultimate > last)  operationResult = 1;    
-            else
-            if ((execCmds [executingCmd] -> cmdNumber == LESS)      && penultimate < last)  operationResult = 1;
-            else
-            if ((execCmds [executingCmd] -> cmdNumber == EQUAL)     && penultimate == last) operationResult = 1;    
-                           
-            stack -> Push (operationResult);
-        }   
+        if (execCmds [executingCmd] -> cmdNumber == LESSEQUAL) Lessequal ();
         else
-        if (execCmds [executingCmd] -> cmdNumber == RET)
-        {
-            executingCmd = retStack.Pop();        
-        }                                         
+        if (execCmds [executingCmd] -> cmdNumber == MORE)      More      ();
+        else
+        if (execCmds [executingCmd] -> cmdNumber == LESS)      Less      ();
+        else  
+        if (execCmds [executingCmd] -> cmdNumber == EQUAL)     Equal     ();  
+        else
+        if (execCmds [executingCmd] -> cmdNumber == RET)       Ret       ();                                        
         else
         {
             char errData [256];
@@ -217,5 +347,6 @@ void Executor::Execute()
             printf ("\nExecution error:\n======>>>>>>%s<<<<<<======", errData);
             return;
         }
+        executingCmd++;
     }                  
 }
