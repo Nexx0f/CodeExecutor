@@ -3,18 +3,21 @@
 #include "commands.h"
 #include "ExecutableCommand.h"
 
-const int MAX_DATA_SIZE = 2000;
+class Executor;
+
+typedef bool (Executor::*executeFunction) ();
 
 class Executor
 {
 private:
-    VariablesData* varData;
     std::vector <ExecutableCommand*> &execCmds;
-    Stack*         stack;
-    Stack          retStack;
-    std::vector <const char*> stringArguments;
     int executingCmd;
     
+    executeFunction executeFunctions [MAX_CMDS_DECLS_ALLOW];
+        
+    VariablesData* varData;
+    Stack*         stack;
+    Stack          retStack;
     
 public:  
          Executor (std::vector <ExecutableCommand*> &newCmds);

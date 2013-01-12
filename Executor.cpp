@@ -10,6 +10,42 @@ Executor::Executor (std::vector <ExecutableCommand*> &newCmds): execCmds (newCmd
     executingCmd = 0;
     stack = new Stack;
     varData = new VariablesData;
+    
+    for (int i = 0; i < MAX_CMDS_DECLS_ALLOW; i++)
+         executeFunctions [i] = NULL;
+    
+    #define BIND_FUNCTION(a,b) executeFunctions [a] = b
+    
+    BIND_FUNCTION (Commands::PUSH,      &Executor::Push);
+    BIND_FUNCTION (Commands::LABEL,     &Executor::Label);
+    BIND_FUNCTION (Commands::JUMP,      &Executor::Jmp);
+    BIND_FUNCTION (Commands::JB,        &Executor::Jb);
+    BIND_FUNCTION (Commands::JA,        &Executor::Ja);
+    BIND_FUNCTION (Commands::JBE,       &Executor::Jbe);
+    BIND_FUNCTION (Commands::JAE,       &Executor::Jae);
+    BIND_FUNCTION (Commands::JNE,       &Executor::Jne);
+    BIND_FUNCTION (Commands::JE,        &Executor::Je);
+    BIND_FUNCTION (Commands::CALL,      &Executor::Call);
+    BIND_FUNCTION (Commands::ADD,       &Executor::Add);
+    BIND_FUNCTION (Commands::SUB,       &Executor::Sub);
+    BIND_FUNCTION (Commands::MUL,       &Executor::Mul);
+    BIND_FUNCTION (Commands::DIV,       &Executor::Div);
+    BIND_FUNCTION (Commands::TOP,       &Executor::Top);
+    BIND_FUNCTION (Commands::DUP,       &Executor::Dup);
+    BIND_FUNCTION (Commands::HELP,      &Executor::Help);
+    BIND_FUNCTION (Commands::CLEAR,     &Executor::Clear);
+    BIND_FUNCTION (Commands::CLS,       &Executor::Cls);
+    BIND_FUNCTION (Commands::POP,       &Executor::Pop);
+    BIND_FUNCTION (Commands::GETCH,     &Executor::Getch);
+    BIND_FUNCTION (Commands::DECL,      &Executor::Decl);
+    BIND_FUNCTION (Commands::POPTO,     &Executor::Popto);
+    BIND_FUNCTION (Commands::PUSHFROM,  &Executor::Pushfrom);
+    BIND_FUNCTION (Commands::MOREEQUAL, &Executor::Moreequal);
+    BIND_FUNCTION (Commands::LESSEQUAL, &Executor::Lessequal);
+    BIND_FUNCTION (Commands::MORE,      &Executor::More);
+    BIND_FUNCTION (Commands::LESS,      &Executor::Less);
+    BIND_FUNCTION (Commands::EQUAL,     &Executor::Equal);
+    BIND_FUNCTION (Commands::RET,       &Executor::Ret);
 }
 
 bool Executor::Push ()
@@ -81,8 +117,8 @@ bool Executor::JumpCommands ()
         // Find command LABEL in execution list on which we have to jump
         
         for (int i = 0; i < execCmds.size(); i++)
-                if (execCmds [executingCmd] -> cmdNumber == Commands::LABEL &&
-                    !strcmp (execCmds[executingCmd] -> stringArgs[0], execCmds[i] -> stringArgs[0]))
+                if (execCmds [i] -> cmdNumber == Commands::LABEL &&
+                    !strcmp (execCmds[i] -> stringArgs[0], execCmds[i] -> stringArgs[0]))
                     placeOfLabelToJump = i;
         
         // If command LABEL was not found - Error!     
@@ -279,67 +315,8 @@ void Executor::Execute()
     
     while (executingCmd < execCmds.size())
     {
-        if (execCmds [executingCmd] -> cmdNumber == PUSH)      Push      ();
-        else 
-        if (execCmds [executingCmd] -> cmdNumber == LABEL)     Label     ();
-        else
-        if (execCmds [executingCmd] -> cmdNumber == JUMP)      Jmp       ();
-        else
-        if (execCmds [executingCmd] -> cmdNumber == JB)        Jb        ();
-        else
-        if (execCmds [executingCmd] -> cmdNumber == JA)        Ja        ();
-        else
-        if (execCmds [executingCmd] -> cmdNumber == JBE)       Jbe       ();
-        else
-        if (execCmds [executingCmd] -> cmdNumber == JAE)       Jae       ();
-        else
-        if (execCmds [executingCmd] -> cmdNumber == JE)        Je        ();
-        else 
-        if (execCmds [executingCmd] -> cmdNumber == JNE)       Jne       ();
-        else
-        if (execCmds [executingCmd] -> cmdNumber == CALL)      Call      ();   
-        else              
-        if (execCmds [executingCmd] -> cmdNumber == DUMP)      Dump      ();
-        else
-        if (execCmds [executingCmd] -> cmdNumber == ADD)       Add       ();
-        else
-        if (execCmds [executingCmd] -> cmdNumber == MUL)       Mul       ();
-        else
-        if (execCmds [executingCmd] -> cmdNumber == DIV)       Div       ();                     
-        else
-        if (execCmds [executingCmd] -> cmdNumber == SUB)       Sub       ();
-        else
-        if (execCmds [executingCmd] -> cmdNumber == TOP)       Top       ();
-        else
-        if (execCmds [executingCmd] -> cmdNumber == DUP)       Dup       ();            
-        else
-        if (execCmds [executingCmd] -> cmdNumber == HELP)      Help      ();
-        else
-        if (execCmds [executingCmd] -> cmdNumber == CLEAR)     Clear     ();
-        else
-        if (execCmds [executingCmd] -> cmdNumber == CLS)       Cls       ();
-        else   
-        if (execCmds [executingCmd] -> cmdNumber == POP)       Pop       ();
-        else
-        if (execCmds [executingCmd] -> cmdNumber == GETCH)     Getch     ();
-        else
-        if (execCmds [executingCmd] -> cmdNumber == DECL)      Decl      ();
-        else
-        if (execCmds [executingCmd] -> cmdNumber == POPTO)     Popto     ();
-        else
-        if (execCmds [executingCmd] -> cmdNumber == PUSHFROM)  Pushfrom  ();             
-        else
-        if (execCmds [executingCmd] -> cmdNumber == MOREEQUAL) Moreequal ();
-        else
-        if (execCmds [executingCmd] -> cmdNumber == LESSEQUAL) Lessequal ();
-        else
-        if (execCmds [executingCmd] -> cmdNumber == MORE)      More      ();
-        else
-        if (execCmds [executingCmd] -> cmdNumber == LESS)      Less      ();
-        else  
-        if (execCmds [executingCmd] -> cmdNumber == EQUAL)     Equal     ();  
-        else
-        if (execCmds [executingCmd] -> cmdNumber == RET)       Ret       ();                                        
+        if (executeFunctions [execCmds [executingCmd] -> cmdNumber] != NULL)    
+            (this ->* executeFunctions [execCmds [executingCmd] -> cmdNumber]) ();
         else
         {
             char errData [256];
@@ -348,5 +325,6 @@ void Executor::Execute()
             return;
         }
         executingCmd++;
-    }                  
+    }    
+    executingCmd = 0;
 }
