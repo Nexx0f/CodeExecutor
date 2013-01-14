@@ -15,7 +15,8 @@ public:
     std::vector <const char*> stringArgs;
     
           ExecutableCommand      (int newCmdNumber);
-         
+         ~ExecutableCommand      ();
+          
     bool  addIntArg              (int newArg);
     bool  addStringArg           (const char* newArg);
     

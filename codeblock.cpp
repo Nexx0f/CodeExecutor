@@ -18,6 +18,10 @@ CodeBlock::CodeBlock()
     languageDeclaration.DeclareCommands();
 }
 
+CodeBlock::~CodeBlock()
+{  
+}
+
 CodeBlock& CodeBlock::LoadBlock(const char* fileName)
 {
     FILE* inF = fopen (fileName, "r");

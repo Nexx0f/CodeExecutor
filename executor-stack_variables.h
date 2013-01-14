@@ -10,23 +10,25 @@ class VariablesData
 {
 public:
     std::vector <Variable> data;
-    int currAmountVar;
+    int                    currAmountVar;
      
-    VariablesData ();       
+public:    
+              VariablesData   ();    
+             ~VariablesData   (); 
      
-    void PushVar (Variable newVar);
-     
-    Variable* FindVar (const char* name);
-     
-    void DumpDeclaredVar ();
+    void      PushVar         (Variable newVar);
+    Variable* FindVar         (const char* name);
+    void      DumpDeclaredVar ();
 };
 
 class Stack
 {
 public:  
    std::vector <int> data;
+   
 public:
-   Stack                 ();
+        Stack            ();
+       ~Stack            ();
     
    int  Push             (int num);
    int  Pop              (); 

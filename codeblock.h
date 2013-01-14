@@ -12,9 +12,10 @@ private:
     
 public:
                CodeBlock ();
+              ~CodeBlock ();
+              
     CodeBlock& LoadBlock (const char* fileName);
     CodeBlock& SetBlock  (const char* string);
     
-    void PrepareInformationToExecutor ();
     ExecutionPlatform& InitExecutor   (ExecutionPlatform* newExecutionPlatform);
 };

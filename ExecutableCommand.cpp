@@ -15,6 +15,10 @@ ExecutableCommand::ExecutableCommand (int newCmdNumber)
     cmdNumber = newCmdNumber;
 }
 
+ExecutableCommand::~ExecutableCommand()
+{
+}
+
 bool ExecutableCommand::addIntArg (int newArg)
 {
     intArgs.push_back (newArg);

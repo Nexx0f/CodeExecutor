@@ -15,6 +15,7 @@ protected:
     
 public:  
                  ExecutionPlatform ();
+                ~ExecutionPlatform ();
          
     virtual void Execute             () = 0;
     virtual void InitCmdsList        (std::vector <ExecutableCommand*> newCmds);
@@ -29,7 +30,6 @@ public:
     virtual bool Je                  () = 0;
     virtual bool Jne                 () = 0;
     virtual bool Call                () = 0;
-    virtual bool JumpCommands        () = 0;
     virtual bool Dump                () = 0;
     virtual bool Add                 () = 0;
     virtual bool Sub                 () = 0;
@@ -50,7 +50,6 @@ public:
     virtual bool More                () = 0; 
     virtual bool Less                () = 0;
     virtual bool Equal               () = 0;
-    virtual bool ComparisonCommands  () = 0;
+    virtual bool NotEqual            () = 0;
     virtual bool Ret                 () = 0;
-    virtual bool DeclareAllVariables () = 0;  
 };

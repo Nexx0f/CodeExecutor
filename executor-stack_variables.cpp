@@ -11,9 +11,13 @@ void MessageAboutError (const char* string)
 
 VariablesData::VariablesData()
 {
-      currAmountVar = 0;
+    currAmountVar = 0;
 }
-         
+ 
+VariablesData::~VariablesData()
+{
+} 
+ 
 void VariablesData::PushVar (Variable newVar)
 {
     data.push_back (newVar);
@@ -47,10 +51,16 @@ void VariablesData::DumpDeclaredVar()
 }
 
 /////=================================
+/* Processors stack emulator */
+/////=================================
 
 Stack::Stack()
 {
 }   
+
+Stack::~Stack()
+{
+}
 
 int Stack::Push (int num)
 {

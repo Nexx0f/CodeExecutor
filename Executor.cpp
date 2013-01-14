@@ -40,10 +40,17 @@ Executor::Executor (): ExecutionPlatform ()
     BIND_FUNCTION (Commands::LESSEQUAL, &ExecutionPlatform::Lessequal);
     BIND_FUNCTION (Commands::MORE,      &ExecutionPlatform::More);
     BIND_FUNCTION (Commands::LESS,      &ExecutionPlatform::Less);
+    BIND_FUNCTION (Commands::NOTEQUAL,  &ExecutionPlatform::NotEqual);
     BIND_FUNCTION (Commands::EQUAL,     &ExecutionPlatform::Equal);
     BIND_FUNCTION (Commands::RET,       &ExecutionPlatform::Ret);
     
     #undef BIND_FUNCTION
+}
+
+Executor::~Executor()
+{
+    delete varData;
+    delete stack;
 }
 
 bool Executor::Push ()
@@ -261,6 +268,12 @@ bool Executor::Equal ()
     ComparisonCommands ();
 } 
 
+bool Executor::NotEqual()
+{
+    ComparisonCommands ();
+}
+
+
 bool Executor::ComparisonCommands ()
 {
     int last = stack -> Pop ();
@@ -277,6 +290,8 @@ bool Executor::ComparisonCommands ()
     if ((execCmds [executingCmd] -> cmdNumber == Commands::LESS)      && penultimate < last)  operationResult = 1;
     else
     if ((execCmds [executingCmd] -> cmdNumber == Commands::EQUAL)     && penultimate == last) operationResult = 1;    
+    else
+    if ((execCmds [executingCmd] -> cmdNumber == Commands::NOTEQUAL)  && penultimate != last) operationResult = 1;  
                     
     stack -> Push (operationResult);    
 } 

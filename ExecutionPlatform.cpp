@@ -8,6 +8,10 @@ ExecutionPlatform::ExecutionPlatform()
          executeFunctions [i] = NULL;
 }
 
+ExecutionPlatform::~ExecutionPlatform()
+{
+}
+
 void ExecutionPlatform::InitCmdsList (std::vector< ExecutableCommand* > newCmds)
 {
     execCmds = newCmds;

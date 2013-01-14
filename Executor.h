@@ -11,6 +11,7 @@ private:
     
 public:  
          Executor ();
+        ~Executor (); 
          
     void Execute  ();
     
@@ -45,6 +46,7 @@ public:
     bool More                (); 
     bool Less                ();
     bool Equal               ();
+    bool NotEqual            ();
     bool ComparisonCommands  ();
     bool Ret                 ();
     bool DeclareAllVariables ();  

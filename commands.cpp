@@ -17,12 +17,22 @@ CommandDeclaration::CommandDeclaration (const char* newName, int newIntArgsAllow
     stringArgsAllow = newStringArgsAllow;
 }
  
+CommandDeclaration::~CommandDeclaration()
+{
+} 
+ 
 LanguageDeclaration::LanguageDeclaration()
 {
     for (int i = 0; i < MAX_CMDS_DECLS_ALLOW; i++)
          cmdDeclarations [i] = NULL;
 }
  
+LanguageDeclaration::~LanguageDeclaration()
+{
+    for (int i = 0; i < MAX_CMDS_DECLS_ALLOW; i++)
+         if (cmdDeclarations [i] != NULL)
+             delete cmdDeclarations [i];
+} 
  
 void LanguageDeclaration::DeclareCommands ()
 {
@@ -50,15 +60,16 @@ void LanguageDeclaration::DeclareCommands ()
     DECLARE_COMMAND (POP,       "pop",      0, 0);
     DECLARE_COMMAND (TOP,       "top",      0, 0);
     DECLARE_COMMAND (GETCH,     "getch",    0, 0);
-    DECLARE_COMMAND (MOREEQUAL, ">=",       0, 0);
-    DECLARE_COMMAND (LESSEQUAL, "<=",       0, 0);
-    DECLARE_COMMAND (MORE,      ">",        0, 0);
-    DECLARE_COMMAND (LESS,      "<",        0, 0);
-    DECLARE_COMMAND (EQUAL,     "==",       0, 0);
+    DECLARE_COMMAND (MOREEQUAL, "me",       0, 0);
+    DECLARE_COMMAND (LESSEQUAL, "le",       0, 0);
+    DECLARE_COMMAND (MORE,      "m",        0, 0);
+    DECLARE_COMMAND (LESS,      "l",        0, 0);
+    DECLARE_COMMAND (EQUAL,     "e",        0, 0);
+    DECLARE_COMMAND (NOTEQUAL,  "ne",       0, 0);
     DECLARE_COMMAND (DIV,       "div",      0, 0);
     DECLARE_COMMAND (RET,       "ret",      0, 0);
     DECLARE_COMMAND (CLEAR,     "clear",    0, 0);
-    DECLARE_COMMAND (CLS,       ">=",       0, 0);
+    DECLARE_COMMAND (CLS,       "cls",      0, 0);
     DECLARE_COMMAND (HELP,      "help",     0, 0);
     
     #undef DECLARE_COMMAND

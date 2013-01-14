@@ -28,6 +28,7 @@ namespace Commands
     const int EQUAL       = 112;
     const int DIV         = 113;
     const int RET         = 114;
+    const int NOTEQUAL    = 115;
     const int CLEAR       = 200;
     const int CLS         = 201;
     const int HELP        = 202;
@@ -44,6 +45,7 @@ struct CommandDeclaration
     
     CommandDeclaration ();
     CommandDeclaration (const char* newName, int newIntArgsAllow, int newStringArgsAllow);
+   ~CommandDeclaration ();
 };
 
 class LanguageDeclaration
@@ -52,6 +54,8 @@ public:
     CommandDeclaration* cmdDeclarations [MAX_CMDS_DECLS_ALLOW];
     
     LanguageDeclaration    ();
+   ~LanguageDeclaration    (); 
+    
     void DeclareCommands   ();
     int FindCommand        (const char* name);
     void PrintCommandsList ();
