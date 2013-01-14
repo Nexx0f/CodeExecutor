@@ -1,26 +1,16 @@
 #include "executor-stack_variables.h"
 #include <stdio.h>
-#include "commands.h"
-#include "ExecutableCommand.h"
+#include "ExecutionPlatform.h"
 
-class Executor;
-
-typedef bool (Executor::*executeFunction) ();
-
-class Executor
+class Executor: public ExecutionPlatform
 {
 private:
-    std::vector <ExecutableCommand*> &execCmds;
-    int executingCmd;
-    
-    executeFunction executeFunctions [MAX_CMDS_DECLS_ALLOW];
-        
     VariablesData* varData;
     Stack*         stack;
     Stack          retStack;
     
 public:  
-         Executor (std::vector <ExecutableCommand*> &newCmds);
+         Executor ();
          
     void Execute  ();
     

@@ -8,7 +8,7 @@ private:
     std::vector <ExecutableCommand*> execCmds;
     LanguageDeclaration languageDeclaration;
     int currentCmdAmount;
-    Executor* executor;
+    ExecutionPlatform* executionPlatform;
     
 public:
                CodeBlock ();
@@ -16,5 +16,5 @@ public:
     CodeBlock& SetBlock  (const char* string);
     
     void PrepareInformationToExecutor ();
-    Executor& InitExecutor            ();
+    ExecutionPlatform& InitExecutor   (ExecutionPlatform* newExecutionPlatform);
 };

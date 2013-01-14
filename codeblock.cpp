@@ -83,8 +83,9 @@ CodeBlock& CodeBlock::SetBlock (const char* string)
     return LoadBlock ("temp.txt");
 }
 
-Executor& CodeBlock::InitExecutor()
+ExecutionPlatform& CodeBlock::InitExecutor(ExecutionPlatform* newExecutionPlatform)
 {
-    executor = new Executor (execCmds);
-    return *executor;
+    executionPlatform = newExecutionPlatform;
+    executionPlatform -> InitCmdsList (execCmds);
+    return *executionPlatform;
 }

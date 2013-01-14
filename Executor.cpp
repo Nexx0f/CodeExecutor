@@ -5,47 +5,45 @@
 #include <fstream>
 #include <conio.h>
 
-Executor::Executor (std::vector <ExecutableCommand*> &newCmds): execCmds (newCmds)
+Executor::Executor (): ExecutionPlatform ()
 {
-    executingCmd = 0;
     stack = new Stack;
     varData = new VariablesData;
     
-    for (int i = 0; i < MAX_CMDS_DECLS_ALLOW; i++)
-         executeFunctions [i] = NULL;
-    
     #define BIND_FUNCTION(a,b) executeFunctions [a] = b
     
-    BIND_FUNCTION (Commands::PUSH,      &Executor::Push);
-    BIND_FUNCTION (Commands::LABEL,     &Executor::Label);
-    BIND_FUNCTION (Commands::JUMP,      &Executor::Jmp);
-    BIND_FUNCTION (Commands::JB,        &Executor::Jb);
-    BIND_FUNCTION (Commands::JA,        &Executor::Ja);
-    BIND_FUNCTION (Commands::JBE,       &Executor::Jbe);
-    BIND_FUNCTION (Commands::JAE,       &Executor::Jae);
-    BIND_FUNCTION (Commands::JNE,       &Executor::Jne);
-    BIND_FUNCTION (Commands::JE,        &Executor::Je);
-    BIND_FUNCTION (Commands::CALL,      &Executor::Call);
-    BIND_FUNCTION (Commands::ADD,       &Executor::Add);
-    BIND_FUNCTION (Commands::SUB,       &Executor::Sub);
-    BIND_FUNCTION (Commands::MUL,       &Executor::Mul);
-    BIND_FUNCTION (Commands::DIV,       &Executor::Div);
-    BIND_FUNCTION (Commands::TOP,       &Executor::Top);
-    BIND_FUNCTION (Commands::DUP,       &Executor::Dup);
-    BIND_FUNCTION (Commands::HELP,      &Executor::Help);
-    BIND_FUNCTION (Commands::CLEAR,     &Executor::Clear);
-    BIND_FUNCTION (Commands::CLS,       &Executor::Cls);
-    BIND_FUNCTION (Commands::POP,       &Executor::Pop);
-    BIND_FUNCTION (Commands::GETCH,     &Executor::Getch);
-    BIND_FUNCTION (Commands::DECL,      &Executor::Decl);
-    BIND_FUNCTION (Commands::POPTO,     &Executor::Popto);
-    BIND_FUNCTION (Commands::PUSHFROM,  &Executor::Pushfrom);
-    BIND_FUNCTION (Commands::MOREEQUAL, &Executor::Moreequal);
-    BIND_FUNCTION (Commands::LESSEQUAL, &Executor::Lessequal);
-    BIND_FUNCTION (Commands::MORE,      &Executor::More);
-    BIND_FUNCTION (Commands::LESS,      &Executor::Less);
-    BIND_FUNCTION (Commands::EQUAL,     &Executor::Equal);
-    BIND_FUNCTION (Commands::RET,       &Executor::Ret);
+    BIND_FUNCTION (Commands::PUSH,      &ExecutionPlatform::Push);
+    BIND_FUNCTION (Commands::LABEL,     &ExecutionPlatform::Label);
+    BIND_FUNCTION (Commands::JUMP,      &ExecutionPlatform::Jmp);
+    BIND_FUNCTION (Commands::JB,        &ExecutionPlatform::Jb);
+    BIND_FUNCTION (Commands::JA,        &ExecutionPlatform::Ja);
+    BIND_FUNCTION (Commands::JBE,       &ExecutionPlatform::Jbe);
+    BIND_FUNCTION (Commands::JAE,       &ExecutionPlatform::Jae);
+    BIND_FUNCTION (Commands::JNE,       &ExecutionPlatform::Jne);
+    BIND_FUNCTION (Commands::JE,        &ExecutionPlatform::Je);
+    BIND_FUNCTION (Commands::CALL,      &ExecutionPlatform::Call);
+    BIND_FUNCTION (Commands::ADD,       &ExecutionPlatform::Add);
+    BIND_FUNCTION (Commands::SUB,       &ExecutionPlatform::Sub);
+    BIND_FUNCTION (Commands::MUL,       &ExecutionPlatform::Mul);
+    BIND_FUNCTION (Commands::DIV,       &ExecutionPlatform::Div);
+    BIND_FUNCTION (Commands::TOP,       &ExecutionPlatform::Top);
+    BIND_FUNCTION (Commands::DUP,       &ExecutionPlatform::Dup);
+    BIND_FUNCTION (Commands::HELP,      &ExecutionPlatform::Help);
+    BIND_FUNCTION (Commands::CLEAR,     &ExecutionPlatform::Clear);
+    BIND_FUNCTION (Commands::CLS,       &ExecutionPlatform::Cls);
+    BIND_FUNCTION (Commands::POP,       &ExecutionPlatform::Pop);
+    BIND_FUNCTION (Commands::GETCH,     &ExecutionPlatform::Getch);
+    BIND_FUNCTION (Commands::DECL,      &ExecutionPlatform::Decl);
+    BIND_FUNCTION (Commands::POPTO,     &ExecutionPlatform::Popto);
+    BIND_FUNCTION (Commands::PUSHFROM,  &ExecutionPlatform::Pushfrom);
+    BIND_FUNCTION (Commands::MOREEQUAL, &ExecutionPlatform::Moreequal);
+    BIND_FUNCTION (Commands::LESSEQUAL, &ExecutionPlatform::Lessequal);
+    BIND_FUNCTION (Commands::MORE,      &ExecutionPlatform::More);
+    BIND_FUNCTION (Commands::LESS,      &ExecutionPlatform::Less);
+    BIND_FUNCTION (Commands::EQUAL,     &ExecutionPlatform::Equal);
+    BIND_FUNCTION (Commands::RET,       &ExecutionPlatform::Ret);
+    
+    #undef BIND_FUNCTION
 }
 
 bool Executor::Push ()
