@@ -71,6 +71,9 @@ void LanguageDeclaration::DeclareCommands ()
     DECLARE_COMMAND (CLEAR,     "clear",    0, 0);
     DECLARE_COMMAND (CLS,       "cls",      0, 0);
     DECLARE_COMMAND (HELP,      "help",     0, 0);
+    DECLARE_COMMAND (PRINT,     "print",    0, 1);
+    DECLARE_COMMAND (NEWLINE,   "nline",    0, 0);
+    DECLARE_COMMAND (NEWWORD,   "nword",    0, 0);
     
     #undef DECLARE_COMMAND
 }

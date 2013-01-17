@@ -3,6 +3,7 @@
 
 class ExecutionPlatform;
 
+typedef int (*resultFunction)();
 typedef bool (ExecutionPlatform::*executeFunction) ();
 
 class ExecutionPlatform
@@ -17,8 +18,8 @@ public:
                  ExecutionPlatform ();
                 ~ExecutionPlatform ();
          
-    virtual void Execute             () = 0;
-    virtual void InitCmdsList        (std::vector <ExecutableCommand*> newCmds);
+    virtual resultFunction Execute             () = 0;
+    virtual void           InitCmdsList        (std::vector <ExecutableCommand*> newCmds);
     
     virtual bool Push                () = 0;
     virtual bool Label               () = 0;
@@ -52,4 +53,7 @@ public:
     virtual bool Equal               () = 0;
     virtual bool NotEqual            () = 0;
     virtual bool Ret                 () = 0;
+    virtual bool Print               () = 0;
+    virtual bool NewLine             () = 0;
+    virtual bool NewWord             () = 0;
 };

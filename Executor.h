@@ -13,7 +13,7 @@ public:
          Executor ();
         ~Executor (); 
          
-    void Execute  ();
+    resultFunction Execute   ();
     
     bool Push                ();
     bool Label               ();
@@ -49,5 +49,8 @@ public:
     bool NotEqual            ();
     bool ComparisonCommands  ();
     bool Ret                 ();
+    bool Print               ();
+    bool NewLine             ();
+    bool NewWord             ();
     bool DeclareAllVariables ();  
 };

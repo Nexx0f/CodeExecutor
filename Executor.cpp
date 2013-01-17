@@ -43,6 +43,9 @@ Executor::Executor (): ExecutionPlatform ()
     BIND_FUNCTION (Commands::NOTEQUAL,  &ExecutionPlatform::NotEqual);
     BIND_FUNCTION (Commands::EQUAL,     &ExecutionPlatform::Equal);
     BIND_FUNCTION (Commands::RET,       &ExecutionPlatform::Ret);
+    BIND_FUNCTION (Commands::PRINT,     &ExecutionPlatform::Print);
+    BIND_FUNCTION (Commands::NEWLINE,   &ExecutionPlatform::NewLine);
+    BIND_FUNCTION (Commands::NEWWORD,   &ExecutionPlatform::NewWord);
     
     #undef BIND_FUNCTION
 }
@@ -192,7 +195,7 @@ bool Executor::Div ()
 
 bool Executor::Top ()
 {
-    printf ("%d\n", stack->Top());
+    printf ("%d", stack->Top());
 } 
 
 bool Executor::Dup ()
@@ -315,7 +318,22 @@ bool Executor::DeclareAllVariables ()
     }
 }
 
-void Executor::Execute()
+bool Executor::Print()
+{
+    printf (execCmds [executingCmd] -> stringArgs [0]);
+}
+
+bool Executor::NewLine()
+{
+    printf ("\n");
+}
+
+bool Executor::NewWord()
+{
+    printf (" ");
+}
+
+resultFunction Executor::Execute()
 {
     using namespace Commands;
     
@@ -328,16 +346,25 @@ void Executor::Execute()
     
     while (executingCmd < execCmds.size())
     {
-        if (executeFunctions [execCmds [executingCmd] -> cmdNumber] != NULL)    
-            (this ->* executeFunctions [execCmds [executingCmd] -> cmdNumber]) ();
+        if (executeFunctions [execCmds [executingCmd] -> cmdNumber] != NULL)  
+            if (executeFunctions [execCmds [executingCmd] -> cmdNumber] != NULL)
+                (this ->* executeFunctions [execCmds [executingCmd] -> cmdNumber]) ();
+            else
+            {
+                printf ("\n\nExecution error:\n"
+                        "===========>>>>>>> Command function pointer is NULL, it meants command undeclared"
+                        " or you forgot to bind function <<<<<<<<============");
+                return NULL;
+            }
         else
         {
             char errData [256];
             sprintf (errData, "Unknown command. Command code - %d.", execCmds [executingCmd] -> cmdNumber);
-            printf ("\nExecution error:\n======>>>>>>%s<<<<<<======", errData);
-            return;
+            printf ("\nExecution error:\n======>>>>>> %s <<<<<<======", errData);
+            return NULL;
         }
         executingCmd++;
     }    
     executingCmd = 0;
+    return NULL;
 }

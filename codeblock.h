@@ -1,4 +1,5 @@
-#include "Executor.h"
+//#include "Executor.h"
+#include "JitCompiler.h"
 
 /*In fact, main project class. It contains control of
   interpretation and execution of the code.*/
