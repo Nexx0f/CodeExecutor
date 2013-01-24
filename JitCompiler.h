@@ -6,7 +6,7 @@ class JitCompiler: public ExecutionPlatform
 {  
 private:
     
-    AsmJit::Compiler* compiler;
+    AsmJit::Assembler* compiler;
     
 public:  
          JitCompiler ();
@@ -52,6 +52,4 @@ public:
     bool NewLine               ();
     bool NewWord               ();
     bool DeclareAllVariables   ();  
-    
-    bool ProcessPrintFunctions ();  
 };

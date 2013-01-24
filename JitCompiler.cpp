@@ -7,7 +7,7 @@
 
 JitCompiler::JitCompiler (): ExecutionPlatform ()
 {   
-    compiler = new AsmJit::Compiler;
+    compiler = new AsmJit::Assembler;
     
     #define BIND_FUNCTION(a,b) executeFunctions [a] = b
     
@@ -59,8 +59,15 @@ static _cdecl int printWord (char* string)
     return 0;
 }
 
+static _cdecl int printNumber (int number)
+{
+    printf ("%d", number);
+    return 0;
+}
+
 bool JitCompiler::Push ()
 {
+    compiler -> push (execCmds[executingCmd] -> intArgs [0]);
 }
 
 bool JitCompiler::Label ()
@@ -110,22 +117,39 @@ bool JitCompiler::Dump ()
 
 bool JitCompiler::Add ()
 {
+    compiler -> pop  (AsmJit::eax);
+    compiler -> pop  (AsmJit::ebx);
+    compiler -> add  (AsmJit::eax, AsmJit::ebx);
+    compiler -> push (AsmJit::eax);
 } 
 
 bool JitCompiler::Sub ()
 {
+    compiler -> pop  (AsmJit::eax);
+    compiler -> pop  (AsmJit::ebx);
+    compiler -> sub  (AsmJit::eax, AsmJit::ebx);
+    compiler -> push (AsmJit::eax);    
 } 
 
 bool JitCompiler::Mul ()
 {
+    compiler -> pop  (AsmJit::eax);
+    compiler -> pop  (AsmJit::ebx);
+    compiler -> mul  (AsmJit::ebx);
+    compiler -> push (AsmJit::eax);
 } 
 
 bool JitCompiler::Div ()
 {
+    compiler -> pop  (AsmJit::eax);
+    compiler -> pop  (AsmJit::edx);
+   // compiler -> div  (AsmJit::edx);
+    compiler -> push (AsmJit::edx);    
 } 
 
 bool JitCompiler::Top ()
 {
+    compiler -> call ((void*)printNumber);    
 } 
 
 bool JitCompiler::Dup ()
@@ -202,44 +226,25 @@ bool JitCompiler::DeclareAllVariables ()
 {
 }
 
-bool JitCompiler::ProcessPrintFunctions ()
-{
-     using namespace AsmJit;
-     
-     GPVar string (compiler -> argGP(0));
-     
-     if (execCmds [executingCmd] -> cmdNumber == Commands::PRINT) 
-         compiler -> mov (string, imm (reinterpret_cast <int> (execCmds [executingCmd] -> stringArgs [0])));
-     else
-     if (execCmds [executingCmd] -> cmdNumber == Commands::NEWLINE)
-         compiler -> mov (string, imm (reinterpret_cast <int> ("\n")));
-     else
-     if (execCmds [executingCmd] -> cmdNumber == Commands::NEWWORD)
-         compiler -> mov (string, imm (reinterpret_cast <int> (" ")));
-
-     GPVar printWordAddress (compiler -> newGP ());
-     compiler -> mov (printWordAddress, imm((sysint_t)(void*)printWord)); 
-     
-     ECall* pWord = compiler -> call (printWordAddress);
-     
-     pWord -> setPrototype (CALL_CONV_CDECL, FunctionBuilder1<Void, char*>());
-    
-     pWord -> setArgument(0, string);
-}
-
 bool JitCompiler::Print()
 {
-    ProcessPrintFunctions ();
+     compiler -> push (reinterpret_cast <sysuint_t> (execCmds [executingCmd] -> stringArgs [0]));
+     compiler -> call ((void*)printWord); 
+     compiler -> pop (AsmJit::eax);
 }
 
 bool JitCompiler::NewLine()
-{
-    ProcessPrintFunctions ();
+{   
+     compiler -> push (reinterpret_cast <sysuint_t> ("\n"));
+     compiler -> call ((void*)printWord); 
+     compiler -> pop (AsmJit::eax);
 }
 
 bool JitCompiler::NewWord()
 {
-    ProcessPrintFunctions ();
+     compiler -> push (reinterpret_cast <sysuint_t> (" "));
+     compiler -> call ((void*)printWord); 
+     compiler -> pop (AsmJit::eax);
 }
 
 resultFunction JitCompiler::Execute()
@@ -247,7 +252,7 @@ resultFunction JitCompiler::Execute()
     using namespace Commands;
     using namespace AsmJit;
    
-    compiler -> newFunction(CALL_CONV_DEFAULT, FunctionBuilder1 <int, int>());
+//     compiler -> newFunction(CALL_CONV_DEFAULT, FunctionBuilder1 <int, int>());
     
     // Declare all variables independently of their places in code. I think it's convenient
     
@@ -268,6 +273,12 @@ resultFunction JitCompiler::Execute()
     }    
     executingCmd = 0;
     
-    compiler -> endFunction();
+    compiler -> mov(nax, 0);
+
+    compiler -> mov(nsp, nbp);
+    compiler -> pop(nbp);
+
+    compiler -> ret();
+    
     return function_cast <resultFunction> (compiler -> make ());
 }
