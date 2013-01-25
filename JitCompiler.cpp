@@ -135,16 +135,17 @@ bool JitCompiler::Mul ()
 {
     compiler -> pop  (AsmJit::eax);
     compiler -> pop  (AsmJit::ebx);
-    compiler -> mul  (AsmJit::ebx);
+    compiler -> imul  (AsmJit::ebx);
     compiler -> push (AsmJit::eax);
 } 
 
 bool JitCompiler::Div ()
 {
-    compiler -> pop  (AsmJit::eax);
-    compiler -> pop  (AsmJit::edx);
-   // compiler -> div  (AsmJit::edx);
-    compiler -> push (AsmJit::edx);    
+     compiler -> pop  (AsmJit::eax);
+     compiler -> pop  (AsmJit::ebx);
+     compiler -> cwde ();
+     compiler -> idiv  (AsmJit::ebx);
+     compiler -> push (AsmJit::eax);    
 } 
 
 bool JitCompiler::Top ()
@@ -154,6 +155,9 @@ bool JitCompiler::Top ()
 
 bool JitCompiler::Dup ()
 {
+    compiler -> pop  (AsmJit::eax);
+    compiler -> push (AsmJit::eax);
+    compiler -> push (AsmJit::eax);
 } 
 
 bool JitCompiler::Help ()
@@ -170,6 +174,7 @@ bool JitCompiler::Cls ()
 
 bool JitCompiler::Pop ()
 {
+    compiler -> pop (AsmJit::ebx);
 }
 
 bool JitCompiler::Getch ()
