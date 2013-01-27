@@ -20,6 +20,9 @@ CodeBlock::CodeBlock()
 
 CodeBlock::~CodeBlock()
 {  
+    for (int i = 0; i < execCmds.size(); i++)
+         delete execCmds [i];
+    delete executionPlatform;
 }
 
 CodeBlock& CodeBlock::LoadBlock(const char* fileName)

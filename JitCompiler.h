@@ -1,12 +1,13 @@
 #include "ExecutionPlatform.h"
 #include <map>
+#include <string>
 #include "AsmJit/AsmJit.h"
 
 class JitCompiler: public ExecutionPlatform
 {  
 private:
     
-    AsmJit::Assembler* compiler;
+    AsmJit::Assembler*                    compiler;
     std::map <const char*, AsmJit::Label> labelsData;
     
 public:  

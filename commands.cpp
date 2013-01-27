@@ -19,6 +19,7 @@ CommandDeclaration::CommandDeclaration (const char* newName, int newIntArgsAllow
  
 CommandDeclaration::~CommandDeclaration()
 {
+    delete cmdName;
 } 
  
 LanguageDeclaration::LanguageDeclaration()

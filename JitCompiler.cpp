@@ -52,6 +52,7 @@ JitCompiler::JitCompiler (): ExecutionPlatform ()
 
 JitCompiler::~JitCompiler()
 {
+    delete compiler;
 }
 
 static _cdecl int printWord (char* string)

@@ -17,6 +17,8 @@ ExecutableCommand::ExecutableCommand (int newCmdNumber)
 
 ExecutableCommand::~ExecutableCommand()
 {
+    for (int i = 0; i < stringArgs.size(); i++)
+         delete stringArgs [i];
 }
 
 bool ExecutableCommand::addIntArg (int newArg)
@@ -27,7 +29,7 @@ bool ExecutableCommand::addIntArg (int newArg)
 
 bool ExecutableCommand::addStringArg (const char* newArg)
 {
-    char* arg = new char [strlen (newArg) - 1];
+    char* arg = new char [strlen (newArg)];
     strcpy (arg, newArg);
     stringArgs.push_back (arg);
     return true;

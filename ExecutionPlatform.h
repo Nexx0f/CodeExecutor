@@ -16,7 +16,7 @@ protected:
     
 public:  
                  ExecutionPlatform ();
-                ~ExecutionPlatform ();
+    virtual     ~ExecutionPlatform ();
          
     virtual resultFunction Execute             () = 0;
     virtual void           InitCmdsList        (std::vector <ExecutableCommand*> newCmds);
