@@ -8,6 +8,7 @@
 JitCompiler::JitCompiler (): ExecutionPlatform ()
 {   
     compiler = new AsmJit::Assembler;
+    //labelsData ["abc"] = compiler -> newLabel ();
     
     #define BIND_FUNCTION(a,b) executeFunctions [a] = b
     
@@ -72,43 +73,71 @@ bool JitCompiler::Push ()
 
 bool JitCompiler::Label ()
 {
-    // Nothing to do. Label place will be found during JMP command execution
+    std::map <const char*, AsmJit::Label>::const_iterator foundLabel = labelsData.find (execCmds [executingCmd] -> stringArgs [0]);
+    compiler -> bind (foundLabel -> second);
 }
 
 bool JitCompiler::Jmp ()
 {
+    std::map <const char*, AsmJit::Label>::const_iterator foundLabel = labelsData.find (execCmds [executingCmd] -> stringArgs [0]);
+    compiler -> jmp (foundLabel -> second);
 }
 
 bool JitCompiler::Jb ()
 {
+    ProcessJumpCommands ();
 }
 
 bool JitCompiler::Ja ()
 {
+    ProcessJumpCommands ();
 }
 
 bool JitCompiler::Jae ()
 {
+    ProcessJumpCommands ();
 }
 
 bool JitCompiler::Jbe ()
 {
+    ProcessJumpCommands ();
 }
 
 bool JitCompiler::Je ()
 {
+    ProcessJumpCommands ();
 }
 
 bool JitCompiler::Jne ()
 {
+    ProcessJumpCommands ();
 }
 
 bool JitCompiler::Call ()
 {
 }
 
-bool JitCompiler::JumpCommands ()
+bool JitCompiler::ProcessJumpCommands ()
 {
+    std::map <const char*, AsmJit::Label>::const_iterator foundLabel = labelsData.find (execCmds [executingCmd] -> stringArgs [0]);
+    
+    compiler -> pop  (AsmJit::eax);
+    compiler -> pop  (AsmJit::ebx);
+    compiler -> cmp  (AsmJit::eax, AsmJit::ebx);
+    compiler -> push (AsmJit::ebx);
+    compiler -> push (AsmJit::eax);
+    
+    if (execCmds [executingCmd] -> cmdNumber == Commands::JE)  compiler -> je   (foundLabel -> second);
+    else
+    if (execCmds [executingCmd] -> cmdNumber == Commands::JA)  compiler -> ja   (foundLabel -> second);
+    else        
+    if (execCmds [executingCmd] -> cmdNumber == Commands::JAE) compiler -> jae   (foundLabel -> second);
+    else        
+    if (execCmds [executingCmd] -> cmdNumber == Commands::JB)  compiler -> jb   (foundLabel -> second);
+    else        
+    if (execCmds [executingCmd] -> cmdNumber == Commands::JBE) compiler -> jbe   (foundLabel -> second);
+    else        
+    if (execCmds [executingCmd] -> cmdNumber == Commands::JNE) compiler -> jne   (foundLabel -> second);            
 }  
 
 bool JitCompiler::Dump ()
@@ -252,17 +281,34 @@ bool JitCompiler::NewWord()
      compiler -> pop (AsmJit::eax);
 }
 
+bool JitCompiler::DeclareAllLabels()
+{
+    for (int labelCmd = 0; labelCmd < execCmds.size(); labelCmd++)
+        if (execCmds [labelCmd] -> cmdNumber == Commands::LABEL)
+        {
+            labelsData [execCmds [labelCmd] -> stringArgs [0]] = compiler -> newLabel ();
+            for (int jmpCmd = 0; jmpCmd < execCmds.size(); jmpCmd++)
+                if (execCmds [jmpCmd] -> cmdNumber == Commands::CALL ||
+                    execCmds [jmpCmd] -> cmdNumber == Commands::JUMP ||
+                    execCmds [jmpCmd] -> cmdNumber == Commands::JA   ||
+                    execCmds [jmpCmd] -> cmdNumber == Commands::JAE  ||
+                    execCmds [jmpCmd] -> cmdNumber == Commands::JB   ||
+                    execCmds [jmpCmd] -> cmdNumber == Commands::JBE  ||
+                    execCmds [jmpCmd] -> cmdNumber == Commands::JE   ||
+                    execCmds [jmpCmd] -> cmdNumber == Commands::JNE)
+                    if (!strcmp (execCmds [jmpCmd] -> stringArgs [0], execCmds [labelCmd] -> stringArgs [0]))
+                         execCmds [jmpCmd] -> stringArgs [0] = execCmds [labelCmd] -> stringArgs [0];
+        }
+
+}
+
 resultFunction JitCompiler::Execute()
 {
     using namespace Commands;
     using namespace AsmJit;
    
-//     compiler -> newFunction(CALL_CONV_DEFAULT, FunctionBuilder1 <int, int>());
-    
-    // Declare all variables independently of their places in code. I think it's convenient
-    
-    DeclareAllVariables ();
-    
+    DeclareAllLabels (); 
+     
     while (executingCmd < execCmds.size())
     {
         if (executeFunctions [execCmds [executingCmd] -> cmdNumber] != NULL)    

@@ -1,5 +1,5 @@
 #include "ExecutionPlatform.h"
-
+#include <map>
 #include "AsmJit/AsmJit.h"
 
 class JitCompiler: public ExecutionPlatform
@@ -7,6 +7,7 @@ class JitCompiler: public ExecutionPlatform
 private:
     
     AsmJit::Assembler* compiler;
+    std::map <const char*, AsmJit::Label> labelsData;
     
 public:  
          JitCompiler ();
@@ -24,7 +25,6 @@ public:
     bool Je                    ();
     bool Jne                   ();
     bool Call                  ();
-    bool JumpCommands          ();
     bool Dump                  ();
     bool Add                   ();
     bool Sub                   ();
@@ -52,4 +52,6 @@ public:
     bool NewLine               ();
     bool NewWord               ();
     bool DeclareAllVariables   ();  
+    bool DeclareAllLabels      ();
+    bool ProcessJumpCommands          ();
 };
