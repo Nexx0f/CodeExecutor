@@ -20,7 +20,7 @@ JitCompiler::JitCompiler (): ExecutionPlatform ()
     BIND_FUNCTION (Commands::JAE,       &ExecutionPlatform::Jae);
     BIND_FUNCTION (Commands::JNE,       &ExecutionPlatform::Jne);
     BIND_FUNCTION (Commands::JE,        &ExecutionPlatform::Je);
-    //BIND_FUNCTION (Commands::CALL,      &ExecutionPlatform::Call);
+    BIND_FUNCTION (Commands::CALL,      &ExecutionPlatform::Call);
     BIND_FUNCTION (Commands::ADD,       &ExecutionPlatform::Add);
     BIND_FUNCTION (Commands::SUB,       &ExecutionPlatform::Sub);
     BIND_FUNCTION (Commands::MUL,       &ExecutionPlatform::Mul);
@@ -31,8 +31,8 @@ JitCompiler::JitCompiler (): ExecutionPlatform ()
     //BIND_FUNCTION (Commands::CLEAR,     &ExecutionPlatform::Clear);
     //BIND_FUNCTION (Commands::CLS,       &ExecutionPlatform::Cls);
     BIND_FUNCTION (Commands::POP,       &ExecutionPlatform::Pop);
-    //BIND_FUNCTION (Commands::GETCH,     &ExecutionPlatform::Getch);
-    BIND_FUNCTION (Commands::DECL,      &ExecutionPlatform::Decl);
+    //BIND_FUNCTION (Commands::GETCH,     &ExecutionPlatform::Getch);(more
+    //BIND_FUNCTION (Commands::DECL,      &ExecutionPlatform::Decl);
     //BIND_FUNCTION (Commands::POPTO,     &ExecutionPlatform::Popto);
     //BIND_FUNCTION (Commands::PUSHFROM,  &ExecutionPlatform::Pushfrom);
     BIND_FUNCTION (Commands::MOREEQUAL, &ExecutionPlatform::Moreequal);
@@ -41,7 +41,7 @@ JitCompiler::JitCompiler (): ExecutionPlatform ()
     BIND_FUNCTION (Commands::LESS,      &ExecutionPlatform::Less);
     BIND_FUNCTION (Commands::NOTEQUAL,  &ExecutionPlatform::NotEqual);
     BIND_FUNCTION (Commands::EQUAL,     &ExecutionPlatform::Equal);
-    //BIND_FUNCTION (Commands::RET,       &ExecutionPlatform::Ret);
+    BIND_FUNCTION (Commands::RET,       &ExecutionPlatform::Ret);
     BIND_FUNCTION (Commands::PRINT,     &ExecutionPlatform::Print);
     BIND_FUNCTION (Commands::NEWLINE,   &ExecutionPlatform::NewLine);
     BIND_FUNCTION (Commands::NEWWORD,   &ExecutionPlatform::NewWord);
@@ -115,6 +115,8 @@ bool JitCompiler::Jne ()
 
 bool JitCompiler::Call ()
 {
+    std::map <const char*, AsmJit::Label>::const_iterator foundLabel = labelsData.find (execCmds [executingCmd] -> stringArgs [0]);
+    compiler -> call (foundLabel -> second);
 }
 
 bool JitCompiler::ProcessJumpCommands ()
@@ -278,6 +280,7 @@ bool JitCompiler::ComparisonCommands ()
 
 bool JitCompiler::Ret ()
 {
+    compiler -> ret ();
 } 
 
 bool JitCompiler::DeclareAllVariables ()
