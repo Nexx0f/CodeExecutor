@@ -1,5 +1,4 @@
 #include "executor-stack_variables.h"
-#include <stdio.h>
 #include "ExecutionPlatform.h"
 
 class Executor: public ExecutionPlatform

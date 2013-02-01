@@ -3,7 +3,6 @@
 #include "string.h"
 #include <iostream>
 #include <fstream>
-#include <conio.h>
 
 JitCompiler::JitCompiler (): ExecutionPlatform ()
 {   
@@ -21,28 +20,28 @@ JitCompiler::JitCompiler (): ExecutionPlatform ()
     BIND_FUNCTION (Commands::JAE,       &ExecutionPlatform::Jae);
     BIND_FUNCTION (Commands::JNE,       &ExecutionPlatform::Jne);
     BIND_FUNCTION (Commands::JE,        &ExecutionPlatform::Je);
-    BIND_FUNCTION (Commands::CALL,      &ExecutionPlatform::Call);
+    //BIND_FUNCTION (Commands::CALL,      &ExecutionPlatform::Call);
     BIND_FUNCTION (Commands::ADD,       &ExecutionPlatform::Add);
     BIND_FUNCTION (Commands::SUB,       &ExecutionPlatform::Sub);
     BIND_FUNCTION (Commands::MUL,       &ExecutionPlatform::Mul);
     BIND_FUNCTION (Commands::DIV,       &ExecutionPlatform::Div);
     BIND_FUNCTION (Commands::TOP,       &ExecutionPlatform::Top);
     BIND_FUNCTION (Commands::DUP,       &ExecutionPlatform::Dup);
-    BIND_FUNCTION (Commands::HELP,      &ExecutionPlatform::Help);
-    BIND_FUNCTION (Commands::CLEAR,     &ExecutionPlatform::Clear);
-    BIND_FUNCTION (Commands::CLS,       &ExecutionPlatform::Cls);
+    //BIND_FUNCTION (Commands::HELP,      &ExecutionPlatform::Help);
+    //BIND_FUNCTION (Commands::CLEAR,     &ExecutionPlatform::Clear);
+    //BIND_FUNCTION (Commands::CLS,       &ExecutionPlatform::Cls);
     BIND_FUNCTION (Commands::POP,       &ExecutionPlatform::Pop);
-    BIND_FUNCTION (Commands::GETCH,     &ExecutionPlatform::Getch);
+    //BIND_FUNCTION (Commands::GETCH,     &ExecutionPlatform::Getch);
     BIND_FUNCTION (Commands::DECL,      &ExecutionPlatform::Decl);
-    BIND_FUNCTION (Commands::POPTO,     &ExecutionPlatform::Popto);
-    BIND_FUNCTION (Commands::PUSHFROM,  &ExecutionPlatform::Pushfrom);
-    BIND_FUNCTION (Commands::MOREEQUAL, &ExecutionPlatform::Moreequal);
-    BIND_FUNCTION (Commands::LESSEQUAL, &ExecutionPlatform::Lessequal);
-    BIND_FUNCTION (Commands::MORE,      &ExecutionPlatform::More);
-    BIND_FUNCTION (Commands::LESS,      &ExecutionPlatform::Less);
-    BIND_FUNCTION (Commands::NOTEQUAL,  &ExecutionPlatform::NotEqual);
-    BIND_FUNCTION (Commands::EQUAL,     &ExecutionPlatform::Equal);
-    BIND_FUNCTION (Commands::RET,       &ExecutionPlatform::Ret);
+    //BIND_FUNCTION (Commands::POPTO,     &ExecutionPlatform::Popto);
+    //BIND_FUNCTION (Commands::PUSHFROM,  &ExecutionPlatform::Pushfrom);
+    //BIND_FUNCTION (Commands::MOREEQUAL, &ExecutionPlatform::Moreequal);
+    //BIND_FUNCTION (Commands::LESSEQUAL, &ExecutionPlatform::Lessequal);
+    //BIND_FUNCTION (Commands::MORE,      &ExecutionPlatform::More);
+    //BIND_FUNCTION (Commands::LESS,      &ExecutionPlatform::Less);
+    //BIND_FUNCTION (Commands::NOTEQUAL,  &ExecutionPlatform::NotEqual);
+    //BIND_FUNCTION (Commands::EQUAL,     &ExecutionPlatform::Equal);
+    //BIND_FUNCTION (Commands::RET,       &ExecutionPlatform::Ret);
     BIND_FUNCTION (Commands::PRINT,     &ExecutionPlatform::Print);
     BIND_FUNCTION (Commands::NEWLINE,   &ExecutionPlatform::NewLine);
     BIND_FUNCTION (Commands::NEWWORD,   &ExecutionPlatform::NewWord);
@@ -53,17 +52,17 @@ JitCompiler::JitCompiler (): ExecutionPlatform ()
 JitCompiler::~JitCompiler()
 {
     delete compiler;
-}
+} 
 
-static _cdecl int printWord (char* string)
+static int printWord (char* string)
 {
     printf ("%s", string);
     return 0;
 }
 
-static _cdecl int printNumber (int number)
+static int printNumber (sysint_t* number)
 {
-    printf ("%d", number);
+    printf ("%d", *number);
     return 0;
 }
 
@@ -122,11 +121,11 @@ bool JitCompiler::ProcessJumpCommands ()
 {
     std::map <const char*, AsmJit::Label>::const_iterator foundLabel = labelsData.find (execCmds [executingCmd] -> stringArgs [0]);
     
-    compiler -> pop  (AsmJit::eax);
-    compiler -> pop  (AsmJit::ebx);
-    compiler -> cmp  (AsmJit::eax, AsmJit::ebx);
-    compiler -> push (AsmJit::ebx);
-    compiler -> push (AsmJit::eax);
+    compiler -> pop  (AsmJit::rax);
+    compiler -> pop  (AsmJit::rbx);
+    compiler -> cmp  (AsmJit::rax, AsmJit::rbx);
+    compiler -> push (AsmJit::rbx);
+    compiler -> push (AsmJit::rax);
     
     if (execCmds [executingCmd] -> cmdNumber == Commands::JE)  compiler -> je   (foundLabel -> second);
     else
@@ -147,47 +146,48 @@ bool JitCompiler::Dump ()
 
 bool JitCompiler::Add ()
 {
-    compiler -> pop  (AsmJit::eax);
-    compiler -> pop  (AsmJit::ebx);
-    compiler -> add  (AsmJit::eax, AsmJit::ebx);
-    compiler -> push (AsmJit::eax);
+    compiler -> pop  (AsmJit::rax);
+    compiler -> pop  (AsmJit::rbx);
+    compiler -> add  (AsmJit::rax, AsmJit::rbx);
+    compiler -> push (AsmJit::rax);
 } 
 
 bool JitCompiler::Sub ()
 {
-    compiler -> pop  (AsmJit::eax);
-    compiler -> pop  (AsmJit::ebx);
-    compiler -> sub  (AsmJit::eax, AsmJit::ebx);
-    compiler -> push (AsmJit::eax);    
+    compiler -> pop  (AsmJit::rax);
+    compiler -> pop  (AsmJit::rbx);
+    compiler -> sub  (AsmJit::rax, AsmJit::rbx);
+    compiler -> push (AsmJit::rax);    
 } 
 
 bool JitCompiler::Mul ()
 {
-    compiler -> pop  (AsmJit::eax);
-    compiler -> pop  (AsmJit::ebx);
-    compiler -> imul  (AsmJit::ebx);
-    compiler -> push (AsmJit::eax);
+    compiler -> pop   (AsmJit::rax);
+    compiler -> pop   (AsmJit::rbx);
+    compiler -> imul  (AsmJit::rbx);
+    compiler -> push  (AsmJit::rax);
 } 
 
 bool JitCompiler::Div ()
 {
-     compiler -> pop  (AsmJit::eax);
-     compiler -> pop  (AsmJit::ebx);
-     compiler -> cwde ();
-     compiler -> idiv  (AsmJit::ebx);
-     compiler -> push (AsmJit::eax);    
+     compiler -> pop   (AsmJit::rax);
+     compiler -> pop   (AsmJit::rbx);
+     compiler -> cdqe  ();
+     compiler -> idiv  (AsmJit::rbx);
+     compiler -> push  (AsmJit::rax);    
 } 
 
 bool JitCompiler::Top ()
 {
+    compiler -> mov  (AsmJit::rdi, AsmJit::rsp);
     compiler -> call ((void*)printNumber);    
 } 
 
 bool JitCompiler::Dup ()
 {
-    compiler -> pop  (AsmJit::eax);
-    compiler -> push (AsmJit::eax);
-    compiler -> push (AsmJit::eax);
+    compiler -> pop  (AsmJit::rax);
+    compiler -> push (AsmJit::rax);
+    compiler -> push (AsmJit::rax);
 } 
 
 bool JitCompiler::Help ()
@@ -204,7 +204,7 @@ bool JitCompiler::Cls ()
 
 bool JitCompiler::Pop ()
 {
-    compiler -> pop (AsmJit::ebx);
+   compiler -> pop (AsmJit::rbx);
 }
 
 bool JitCompiler::Getch ()
@@ -250,7 +250,7 @@ bool JitCompiler::NotEqual()
 }
 
 bool JitCompiler::ComparisonCommands ()
-{ 
+{
 } 
 
 bool JitCompiler::Ret ()
@@ -263,23 +263,20 @@ bool JitCompiler::DeclareAllVariables ()
 
 bool JitCompiler::Print()
 {
-     compiler -> push (reinterpret_cast <sysuint_t> (execCmds [executingCmd] -> stringArgs [0]));
-     compiler -> call ((void*)printWord); 
-     compiler -> pop (AsmJit::eax);
+    compiler -> mov (AsmJit::rdi, reinterpret_cast <sysuint_t> (execCmds [executingCmd] -> stringArgs [0]));
+    compiler -> call ((void*)printWord); 
 }
 
 bool JitCompiler::NewLine()
 {   
-     compiler -> push (reinterpret_cast <sysuint_t> ("\n"));
-     compiler -> call ((void*)printWord); 
-     compiler -> pop (AsmJit::eax);
+    compiler -> mov (AsmJit::rdi, reinterpret_cast <sysuint_t> ("\n"));
+    compiler -> call ((void*)printWord); 
 }
 
 bool JitCompiler::NewWord()
 {
-     compiler -> push (reinterpret_cast <sysuint_t> (" "));
-     compiler -> call ((void*)printWord); 
-     compiler -> pop (AsmJit::eax);
+    compiler -> mov (AsmJit::rdi, reinterpret_cast <sysuint_t> (" "));
+    compiler -> call ((void*)printWord);
 }
 
 bool JitCompiler::DeclareAllLabels()
@@ -307,7 +304,10 @@ resultFunction JitCompiler::Execute()
 {
     using namespace Commands;
     using namespace AsmJit;
-   
+    
+    compiler -> push (nbp);
+    compiler -> mov  (nbp, nsp);
+    
     DeclareAllLabels (); 
      
     while (executingCmd < execCmds.size())

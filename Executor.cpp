@@ -3,7 +3,6 @@
 #include "string.h"
 #include <iostream>
 #include <fstream>
-#include <conio.h>
 
 Executor::Executor (): ExecutionPlatform ()
 {
@@ -225,7 +224,7 @@ bool Executor::Pop ()
 
 bool Executor::Getch ()
 {
-    getch();
+    getchar ();
 }
 
 bool Executor::Decl ()
