@@ -39,19 +39,21 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
           int x = fscanf (inF, "%s", &string);
           if(x <= 0) break;
           
-          int cmd = languageDeclaration.FindCommand (string);
+          std::string stringStd (string);
           
-          if (cmd == -1)
-          {
-              printf ("\n\n==Error==>>>>>> Undeclared command - %d <<<<<<==Error==\n\n", string);
-              break;
-          }
+          CommandDeclaration* cmd = languageDeclaration.FindCommand (stringStd);
+          
+         // if (cmd == -1)
+         // {
+          //    printf ("\n\n==Error==>>>>>> Undeclared command - %d <<<<<<==Error==\n\n", string);
+          //    break;
+          //}
           
           $ printf ("%s", string);
           
-          execCmds.push_back (new ExecutableCommand (cmd));
+          execCmds.push_back (new ExecutableCommand (cmd -> cmdNumber));
           
-          for (int i = 0; i < languageDeclaration.cmdDeclarations [cmd] -> intArgsAllow; i++)
+          for (int i = 0; i < cmd -> intArgsAllow; i++)
           {
               int arg = 0;
               fscanf (inF, "%d", &arg);
@@ -61,7 +63,7 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
               execCmds [currentCmdAmount] -> addIntArg (arg);
           }
           
-          for (int i = 0; i < languageDeclaration.cmdDeclarations [cmd] -> stringArgsAllow; i++)
+          for (int i = 0; i < cmd -> stringArgsAllow; i++)
           {
               char arg [MAX_VARIABLE_NAME_LENGTH]; 
               fscanf (inF, "%s", arg);

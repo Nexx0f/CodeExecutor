@@ -4,14 +4,16 @@
  
 CommandDeclaration::CommandDeclaration()
 {
-    cmdName = NULL;
+    //cmdName = NULL;
     intArgsAllow = 0;
     stringArgsAllow = 0;
 }
  
-CommandDeclaration::CommandDeclaration (const char* newName, int newIntArgsAllow, int newStringArgsAllow)
+CommandDeclaration::CommandDeclaration (const char* newName, int newIntArgsAllow, int newStringArgsAllow, int newNumber)
 {
-    cmdName = newName;
+    std::string newStr (newName);
+    cmdName = newStr;
+    cmdNumber = newNumber;
     
     intArgsAllow = newIntArgsAllow;
     stringArgsAllow = newStringArgsAllow;
@@ -19,25 +21,25 @@ CommandDeclaration::CommandDeclaration (const char* newName, int newIntArgsAllow
  
 CommandDeclaration::~CommandDeclaration()
 {
-    delete cmdName;
+    //delete cmdName;
 } 
  
 LanguageDeclaration::LanguageDeclaration()
 {
-    for (int i = 0; i < MAX_CMDS_DECLS_ALLOW; i++)
-         cmdDeclarations [i] = NULL;
+    //for (int i = 0; i < MAX_CMDS_DECLS_ALLOW; i++)
+    //     cmdDeclarations [i] = NULL;
 }
  
 LanguageDeclaration::~LanguageDeclaration()
 {
-    for (int i = 0; i < MAX_CMDS_DECLS_ALLOW; i++)
-         if (cmdDeclarations [i] != NULL)
-             delete cmdDeclarations [i];
+    //for (int i = 0; i < MAX_CMDS_DECLS_ALLOW; i++)
+    //     if (cmdDeclarations [i] != NULL)
+     //        delete cmdDeclarations [i];
 } 
  
 void LanguageDeclaration::DeclareCommands ()
 {
-    #define DECLARE_COMMAND(a,b,c,d) cmdDeclarations [a] = new CommandDeclaration (b, c, d) 
+    #define DECLARE_COMMAND(a,b,c,d) cmdDeclarations [b] = new CommandDeclaration (b, c, d, a) 
     
     using namespace Commands;
     DECLARE_COMMAND (PUSH,      "push",     1, 0);
@@ -71,7 +73,6 @@ void LanguageDeclaration::DeclareCommands ()
     DECLARE_COMMAND (RET,       "ret",      0, 0);
     DECLARE_COMMAND (CLEAR,     "clear",    0, 0);
     DECLARE_COMMAND (CLS,       "cls",      0, 0);
-    DECLARE_COMMAND (HELP,      "help",     0, 0);
     DECLARE_COMMAND (PRINT,     "print",    0, 1);
     DECLARE_COMMAND (NEWLINE,   "nline",    0, 0);
     DECLARE_COMMAND (NEWWORD,   "nword",    0, 0);
@@ -81,19 +82,16 @@ void LanguageDeclaration::DeclareCommands ()
 
 void LanguageDeclaration::PrintCommandsList()
 {
-    for (int i = 0; i < MAX_CMDS_DECLS_ALLOW; i++)
-         if (cmdDeclarations [i] != NULL) printf ("Cmd number - %d; Name - \"%s\"; Args - %d, %d\n",
-                                                          i,
-                                                          cmdDeclarations [i] -> cmdName,
-                                                          cmdDeclarations [i] -> intArgsAllow,
-                                                          cmdDeclarations [i] -> stringArgsAllow);
+   // for (int i = 0; i < MAX_CMDS_DECLS_ALLOW; i++)
+   //      if (cmdDeclarations [i] != NULL) printf ("Cmd number - %d; Name - \"%s\"; Args - %d, %d\n",
+   //                                                       i,
+   //                                                       cmdDeclarations [i] -> cmdName,
+   //                                                       cmdDeclarations [i] -> intArgsAllow,
+  //                                                        cmdDeclarations [i] -> stringArgsAllow);
 }
 
-int LanguageDeclaration::FindCommand (const char* name)
+CommandDeclaration* LanguageDeclaration::FindCommand (std::string name)
 {
-    for (int i = 0; i < MAX_CMDS_DECLS_ALLOW; i++)
-        if (cmdDeclarations [i] != NULL) 
-            if (!strcmp (cmdDeclarations [i] -> cmdName, name))
-                return i;
-    return -1;
+    std::map <std::string, CommandDeclaration*>::const_iterator foundCmd = cmdDeclarations.find (name);
+    return foundCmd -> second;
 }

@@ -1,3 +1,6 @@
+#include <map>
+#include <string>
+
 namespace Commands 
 {
     const int PUSH        = 1; 
@@ -42,25 +45,26 @@ const int MAX_CMDS_DECLS_ALLOW = 1000;
 
 struct CommandDeclaration
 {
-    const char* cmdName;
-    int intArgsAllow;
-    int stringArgsAllow;
+    int         cmdNumber;
+    std::string cmdName;
+    int         intArgsAllow;
+    int         stringArgsAllow;
     
     CommandDeclaration ();
-    CommandDeclaration (const char* newName, int newIntArgsAllow, int newStringArgsAllow);
+    CommandDeclaration (const char* newName, int newIntArgsAllow, int newStringArgsAllow, int newNumber);
    ~CommandDeclaration ();
 };
 
 class LanguageDeclaration
 {
 public:
-    CommandDeclaration* cmdDeclarations [MAX_CMDS_DECLS_ALLOW];
+    std::map <std::string, CommandDeclaration*> cmdDeclarations;
     
     LanguageDeclaration    ();
    ~LanguageDeclaration    (); 
     
-    void DeclareCommands   ();
-    int FindCommand        (const char* name);
-    void PrintCommandsList ();
+    void                DeclareCommands   ();
+    CommandDeclaration*  FindCommand       (std::string name);
+    void                PrintCommandsList ();
 };
 

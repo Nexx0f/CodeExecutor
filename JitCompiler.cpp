@@ -27,7 +27,6 @@ JitCompiler::JitCompiler (): ExecutionPlatform ()
     BIND_FUNCTION (Commands::DIV,       &ExecutionPlatform::Div);
     BIND_FUNCTION (Commands::TOP,       &ExecutionPlatform::Top);
     BIND_FUNCTION (Commands::DUP,       &ExecutionPlatform::Dup);
-    //BIND_FUNCTION (Commands::HELP,      &ExecutionPlatform::Help);
     //BIND_FUNCTION (Commands::CLEAR,     &ExecutionPlatform::Clear);
     //BIND_FUNCTION (Commands::CLS,       &ExecutionPlatform::Cls);
     BIND_FUNCTION (Commands::POP,       &ExecutionPlatform::Pop);
@@ -192,10 +191,6 @@ bool JitCompiler::Dup ()
     compiler -> push (AsmJit::rax);
 } 
 
-bool JitCompiler::Help ()
-{
-} 
-
 bool JitCompiler::Clear ()
 {
 }
@@ -312,9 +307,9 @@ bool JitCompiler::DeclareAllLabels()
         {
             labelsData [execCmds [labelCmd] -> stringArgs [0]] = compiler -> newLabel ();
             for (int jmpCmd = 0; jmpCmd < execCmds.size(); jmpCmd++)
-                if (execCmds [jmpCmd] -> cmdNumber == Commands::CALL ||
-                    execCmds [jmpCmd] -> cmdNumber == Commands::JUMP ||
-                    execCmds [jmpCmd] -> cmdNumber == Commands::JA   ||
+                if (execCmds [jmpCmd] -> cmdNumber == Commands::CALL ||   /* Dirty hack. Have to be cleaned */
+                    execCmds [jmpCmd] -> cmdNumber == Commands::JUMP ||   /* map::something.find comapare pointers */
+                    execCmds [jmpCmd] -> cmdNumber == Commands::JA   ||   /* but have to compare strings */
                     execCmds [jmpCmd] -> cmdNumber == Commands::JAE  ||
                     execCmds [jmpCmd] -> cmdNumber == Commands::JB   ||
                     execCmds [jmpCmd] -> cmdNumber == Commands::JBE  ||

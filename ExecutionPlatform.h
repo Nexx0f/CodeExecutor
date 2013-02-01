@@ -38,7 +38,6 @@ public:
     virtual bool Div                 () = 0;
     virtual bool Top                 () = 0;
     virtual bool Dup                 () = 0;
-    virtual bool Help                () = 0;
     virtual bool Clear               () = 0;
     virtual bool Cls                 () = 0;
     virtual bool Pop                 () = 0;

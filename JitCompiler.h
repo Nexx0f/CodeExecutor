@@ -33,7 +33,6 @@ public:
     bool Div                   ();
     bool Top                   ();
     bool Dup                   ();
-    bool Help                  ();
     bool Clear                 ();
     bool Cls                   ();
     bool Pop                   ();

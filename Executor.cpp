@@ -27,7 +27,6 @@ Executor::Executor (): ExecutionPlatform ()
     BIND_FUNCTION (Commands::DIV,       &ExecutionPlatform::Div);
     BIND_FUNCTION (Commands::TOP,       &ExecutionPlatform::Top);
     BIND_FUNCTION (Commands::DUP,       &ExecutionPlatform::Dup);
-    BIND_FUNCTION (Commands::HELP,      &ExecutionPlatform::Help);
     BIND_FUNCTION (Commands::CLEAR,     &ExecutionPlatform::Clear);
     BIND_FUNCTION (Commands::CLS,       &ExecutionPlatform::Cls);
     BIND_FUNCTION (Commands::POP,       &ExecutionPlatform::Pop);
@@ -200,11 +199,6 @@ bool Executor::Top ()
 bool Executor::Dup ()
 {
     stack -> Push (stack->Top());
-} 
-
-bool Executor::Help ()
-{
-    printf ("Help unavalible\n");
 } 
 
 bool Executor::Clear ()
