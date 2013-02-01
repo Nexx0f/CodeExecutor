@@ -35,12 +35,12 @@ JitCompiler::JitCompiler (): ExecutionPlatform ()
     BIND_FUNCTION (Commands::DECL,      &ExecutionPlatform::Decl);
     //BIND_FUNCTION (Commands::POPTO,     &ExecutionPlatform::Popto);
     //BIND_FUNCTION (Commands::PUSHFROM,  &ExecutionPlatform::Pushfrom);
-    //BIND_FUNCTION (Commands::MOREEQUAL, &ExecutionPlatform::Moreequal);
-    //BIND_FUNCTION (Commands::LESSEQUAL, &ExecutionPlatform::Lessequal);
-    //BIND_FUNCTION (Commands::MORE,      &ExecutionPlatform::More);
-    //BIND_FUNCTION (Commands::LESS,      &ExecutionPlatform::Less);
-    //BIND_FUNCTION (Commands::NOTEQUAL,  &ExecutionPlatform::NotEqual);
-    //BIND_FUNCTION (Commands::EQUAL,     &ExecutionPlatform::Equal);
+    BIND_FUNCTION (Commands::MOREEQUAL, &ExecutionPlatform::Moreequal);
+    BIND_FUNCTION (Commands::LESSEQUAL, &ExecutionPlatform::Lessequal);
+    BIND_FUNCTION (Commands::MORE,      &ExecutionPlatform::More);
+    BIND_FUNCTION (Commands::LESS,      &ExecutionPlatform::Less);
+    BIND_FUNCTION (Commands::NOTEQUAL,  &ExecutionPlatform::NotEqual);
+    BIND_FUNCTION (Commands::EQUAL,     &ExecutionPlatform::Equal);
     //BIND_FUNCTION (Commands::RET,       &ExecutionPlatform::Ret);
     BIND_FUNCTION (Commands::PRINT,     &ExecutionPlatform::Print);
     BIND_FUNCTION (Commands::NEWLINE,   &ExecutionPlatform::NewLine);
@@ -227,30 +227,53 @@ bool JitCompiler::Pushfrom ()
 
 bool JitCompiler::Moreequal ()
 {
+    ComparisonCommands ();
 } 
 
 bool JitCompiler::Lessequal ()
 {
+    ComparisonCommands ();
 } 
 
 bool JitCompiler::More ()
 {
+    ComparisonCommands ();
 } 
 
 bool JitCompiler::Less ()
 {
+    ComparisonCommands ();
 } 
 
 bool JitCompiler::Equal ()
 {
+    ComparisonCommands ();
 } 
 
 bool JitCompiler::NotEqual()
 {
+    ComparisonCommands ();
 }
 
 bool JitCompiler::ComparisonCommands ()
 {
+    compiler -> pop  (AsmJit::rax);
+    compiler -> pop  (AsmJit::rbx);
+    compiler -> cmp  (AsmJit::rax, AsmJit::rbx);
+    
+    if (execCmds [executingCmd] -> cmdNumber == Commands::EQUAL)     compiler -> sete (AsmJit::rax);
+    else
+    if (execCmds [executingCmd] -> cmdNumber == Commands::NOTEQUAL)  compiler -> setne (AsmJit::rax);
+    else
+    if (execCmds [executingCmd] -> cmdNumber == Commands::MORE)      compiler -> setg (AsmJit::rax);
+    else
+    if (execCmds [executingCmd] -> cmdNumber == Commands::MOREEQUAL) compiler -> setge (AsmJit::rax);
+    else
+    if (execCmds [executingCmd] -> cmdNumber == Commands::LESS)      compiler -> setl (AsmJit::rax);
+    else
+    if (execCmds [executingCmd] -> cmdNumber == Commands::LESSEQUAL) compiler -> setle (AsmJit::rax);
+    
+    compiler -> push (AsmJit::rax);
 } 
 
 bool JitCompiler::Ret ()
