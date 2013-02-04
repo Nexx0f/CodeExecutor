@@ -72,20 +72,22 @@ bool JitCompiler::Push ()
 
 bool JitCompiler::Label ()
 {
-    std::map <const char*, AsmJit::Label>::const_iterator foundLabel = labelsData.find (execCmds [executingCmd] -> stringArgs [0]);
+    std::string stringToFind (execCmds [executingCmd] -> stringArgs [0]);
+    std::map <std::string, AsmJit::Label>::const_iterator foundLabel = labelsData.find (stringToFind);
     compiler -> bind (foundLabel -> second);
 }
 
 bool JitCompiler::Jmp ()
 {
-    std::map <const char*, AsmJit::Label>::const_iterator foundLabel = labelsData.find (execCmds [executingCmd] -> stringArgs [0]);
+    std::string stringToFind (execCmds [executingCmd] -> stringArgs [0]);
+    std::map <std::string, AsmJit::Label>::const_iterator foundLabel = labelsData.find (stringToFind);
     compiler -> jmp (foundLabel -> second);
 }
 
 bool JitCompiler::Jb ()
 {
     ProcessJumpCommands ();
-}
+}       
 
 bool JitCompiler::Ja ()
 {
@@ -114,13 +116,15 @@ bool JitCompiler::Jne ()
 
 bool JitCompiler::Call ()
 {
-    std::map <const char*, AsmJit::Label>::const_iterator foundLabel = labelsData.find (execCmds [executingCmd] -> stringArgs [0]);
+    std::string stringToFind (execCmds [executingCmd] -> stringArgs [0]);
+    std::map <std::string, AsmJit::Label>::const_iterator foundLabel = labelsData.find (stringToFind);
     compiler -> call (foundLabel -> second);
 }
 
 bool JitCompiler::ProcessJumpCommands ()
 {
-    std::map <const char*, AsmJit::Label>::const_iterator foundLabel = labelsData.find (execCmds [executingCmd] -> stringArgs [0]);
+    std::string stringToFind (execCmds [executingCmd] -> stringArgs [0]);
+    std::map <std::string, AsmJit::Label>::const_iterator foundLabel = labelsData.find (stringToFind);
     
     compiler -> pop  (AsmJit::rax);
     compiler -> pop  (AsmJit::rbx);
@@ -305,18 +309,8 @@ bool JitCompiler::DeclareAllLabels()
     for (int labelCmd = 0; labelCmd < execCmds.size(); labelCmd++)
         if (execCmds [labelCmd] -> cmdNumber == Commands::LABEL)
         {
-            labelsData [execCmds [labelCmd] -> stringArgs [0]] = compiler -> newLabel ();
-            for (int jmpCmd = 0; jmpCmd < execCmds.size(); jmpCmd++)
-                if (execCmds [jmpCmd] -> cmdNumber == Commands::CALL ||   /* Dirty hack. Have to be cleaned */
-                    execCmds [jmpCmd] -> cmdNumber == Commands::JUMP ||   /* map::something.find comapare pointers */
-                    execCmds [jmpCmd] -> cmdNumber == Commands::JA   ||   /* but have to compare strings */
-                    execCmds [jmpCmd] -> cmdNumber == Commands::JAE  ||
-                    execCmds [jmpCmd] -> cmdNumber == Commands::JB   ||
-                    execCmds [jmpCmd] -> cmdNumber == Commands::JBE  ||
-                    execCmds [jmpCmd] -> cmdNumber == Commands::JE   ||
-                    execCmds [jmpCmd] -> cmdNumber == Commands::JNE)
-                    if (!strcmp (execCmds [jmpCmd] -> stringArgs [0], execCmds [labelCmd] -> stringArgs [0]))
-                         execCmds [jmpCmd] -> stringArgs [0] = execCmds [labelCmd] -> stringArgs [0];
+            std::string newLabelName (execCmds [labelCmd] -> stringArgs [0]);
+            labelsData [newLabelName] = compiler -> newLabel ();
         }
 
 }

@@ -8,7 +8,7 @@ class JitCompiler: public ExecutionPlatform
 private:
     
     AsmJit::Assembler*                    compiler;
-    std::map <const char*, AsmJit::Label> labelsData;
+    std::map <std::string, AsmJit::Label> labelsData;
     
 public:  
          JitCompiler ();

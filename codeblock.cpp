@@ -43,11 +43,11 @@ CodeBlock& CodeBlock::LoadBlock(const char* fileName)
           
           CommandDeclaration* cmd = languageDeclaration.FindCommand (stringStd);
           
-         // if (cmd == -1)
-         // {
-          //    printf ("\n\n==Error==>>>>>> Undeclared command - %d <<<<<<==Error==\n\n", string);
-          //    break;
-          //}
+          if (cmd == NULL)
+          {
+              printf ("\n\n==Error==>>>>>> Undeclared command - %s <<<<<<==Error==\n\n", string);
+              break;
+          }
           
           $ printf ("%s", string);
           

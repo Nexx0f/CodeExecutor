@@ -93,5 +93,6 @@ void LanguageDeclaration::PrintCommandsList()
 CommandDeclaration* LanguageDeclaration::FindCommand (std::string name)
 {
     std::map <std::string, CommandDeclaration*>::const_iterator foundCmd = cmdDeclarations.find (name);
-    return foundCmd -> second;
+    if (foundCmd != cmdDeclarations.end()) return foundCmd -> second;
+    else                                   return NULL;
 }
