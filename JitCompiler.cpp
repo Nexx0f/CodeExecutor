@@ -4,10 +4,13 @@
 #include <iostream>
 #include <fstream>
 
+VariablesData* variablesData;
+
 JitCompiler::JitCompiler (): ExecutionPlatform ()
 {   
     compiler = new AsmJit::Assembler;
-    //labelsData ["abc"] = compiler -> newLabel ();
+    variablesData = new VariablesData;
+    varData = variablesData;
     
     #define BIND_FUNCTION(a,b) executeFunctions [a] = b
     
@@ -31,9 +34,9 @@ JitCompiler::JitCompiler (): ExecutionPlatform ()
     //BIND_FUNCTION (Commands::CLS,       &ExecutionPlatform::Cls);
     BIND_FUNCTION (Commands::POP,       &ExecutionPlatform::Pop);
     //BIND_FUNCTION (Commands::GETCH,     &ExecutionPlatform::Getch);(more
-    //BIND_FUNCTION (Commands::DECL,      &ExecutionPlatform::Decl);
-    //BIND_FUNCTION (Commands::POPTO,     &ExecutionPlatform::Popto);
-    //BIND_FUNCTION (Commands::PUSHFROM,  &ExecutionPlatform::Pushfrom);
+    BIND_FUNCTION (Commands::DECL,      &ExecutionPlatform::Decl);
+    BIND_FUNCTION (Commands::POPTO,     &ExecutionPlatform::Popto);
+    BIND_FUNCTION (Commands::PUSHFROM,  &ExecutionPlatform::Pushfrom);
     BIND_FUNCTION (Commands::MOREEQUAL, &ExecutionPlatform::Moreequal);
     BIND_FUNCTION (Commands::LESSEQUAL, &ExecutionPlatform::Lessequal);
     BIND_FUNCTION (Commands::MORE,      &ExecutionPlatform::More);
@@ -63,6 +66,26 @@ static int printNumber (sysint_t* number)
 {
     printf ("%d", *number);
     return 0;
+}
+
+static int addVariableToData (const char* name)
+{
+    Variable newVar = {name, 0};
+    variablesData -> PushVar (newVar);
+    return 0;
+}
+
+static int equateVariable (const char* name, int newValue)
+{
+    Variable* var = variablesData -> FindVar(name);
+    var -> value = newValue;
+    return 0;
+}
+
+static int returnValueOfVariable (const char* name)
+{
+    Variable* var = variablesData -> FindVar (name);
+    return var -> value;
 }
 
 bool JitCompiler::Push ()
@@ -214,16 +237,22 @@ bool JitCompiler::Getch ()
 
 bool JitCompiler::Decl ()
 {
-    /* Nothing to do because of all variables were pre-declared during execution
-        independently of their places */
+    compiler -> mov (AsmJit::rdi, reinterpret_cast <sysuint_t> (execCmds [executingCmd] -> stringArgs [0]));
+    compiler -> call ((void*)addVariableToData);
 }
 
 bool JitCompiler::Popto ()
 { 
+    compiler -> mov  (AsmJit::rdi, reinterpret_cast <sysuint_t> (execCmds [executingCmd] -> stringArgs [0]));
+    compiler -> pop  (AsmJit::rsi);
+    compiler -> call ((void*)equateVariable);
 } 
 
 bool JitCompiler::Pushfrom ()
 {
+    compiler -> mov (AsmJit::rdi, reinterpret_cast <sysuint_t> (execCmds [executingCmd] -> stringArgs [0]));
+    compiler -> call ((void*)returnValueOfVariable);
+    compiler -> push (AsmJit::rax);
 } 
 
 bool JitCompiler::Moreequal ()
@@ -281,10 +310,6 @@ bool JitCompiler::Ret ()
 {
     compiler -> ret ();
 } 
-
-bool JitCompiler::DeclareAllVariables ()
-{
-}
 
 bool JitCompiler::Print()
 {

@@ -1,14 +1,19 @@
+#ifndef H_JITCOMPILER
+#define H_JITCOMPILER
+
 #include "ExecutionPlatform.h"
+#include "executor-stack_variables.h"
 #include <map>
 #include <string>
 #include "AsmJit/AsmJit.h"
 
 class JitCompiler: public ExecutionPlatform
 {  
-private:
+public:
     
     AsmJit::Assembler*                    compiler;
     std::map <std::string, AsmJit::Label> labelsData;
+    VariablesData*                        varData;
     
 public:  
          JitCompiler ();
@@ -50,8 +55,9 @@ public:
     bool Ret                   ();
     bool Print                 ();
     bool NewLine               ();
-    bool NewWord               ();
-    bool DeclareAllVariables   ();  
+    bool NewWord               ();  
     bool DeclareAllLabels      ();
     bool ProcessJumpCommands          ();
 };
+
+#endif

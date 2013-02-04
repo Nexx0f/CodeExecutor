@@ -1,3 +1,6 @@
+#ifndef H_EXECUTOR-STACK_VARIABLES
+#define H_EXECUTOR-STACK_VARIABLES
+
 #include <vector>
 
 struct Variable
@@ -35,3 +38,5 @@ public:
    int  Top              ();
    void Dump             ();  
 };
+
+#endif
