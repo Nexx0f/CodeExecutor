@@ -76,6 +76,8 @@ void LanguageDeclaration::DeclareCommands ()
     DECLARE_COMMAND (PRINT,     "print",    0, 1);
     DECLARE_COMMAND (NEWLINE,   "nline",    0, 0);
     DECLARE_COMMAND (NEWWORD,   "nword",    0, 0);
+    DECLARE_COMMAND (PUSHPTR,   "pushptr",  0, 1);
+    DECLARE_COMMAND (POPPTR,   "popptr",   0, 1);
     
     #undef DECLARE_COMMAND
 }

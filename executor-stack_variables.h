@@ -2,11 +2,12 @@
 #define H_EXECUTOR-STACK_VARIABLES
 
 #include <vector>
+#include "AsmJit/AsmJit.h"
 
 struct Variable
 {
     const char* name;
-    int value;   
+    sysint_t value;   
 };
 
 class VariablesData

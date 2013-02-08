@@ -47,6 +47,8 @@ JitCompiler::JitCompiler (): ExecutionPlatform ()
     BIND_FUNCTION (Commands::PRINT,     &ExecutionPlatform::Print);
     BIND_FUNCTION (Commands::NEWLINE,   &ExecutionPlatform::NewLine);
     BIND_FUNCTION (Commands::NEWWORD,   &ExecutionPlatform::NewWord);
+    BIND_FUNCTION (Commands::PUSHPTR,   &ExecutionPlatform::PushPtr);
+    BIND_FUNCTION (Commands::POPPTR,   &ExecutionPlatform::PopPtr);
     
     #undef BIND_FUNCTION
 }
@@ -86,6 +88,19 @@ static int returnValueOfVariable (const char* name)
 {
     Variable* var = variablesData -> FindVar (name);
     return var -> value;
+}
+
+static sysint_t* returnPointerToVariable (const char* name)
+{
+    Variable* var = variablesData -> FindVar (name);
+    return &(var -> value);    
+}
+
+static int pushValueToPointer (const char* name, sysint_t newValue)
+{
+    Variable* var = variablesData -> FindVar (name);
+    *(reinterpret_cast <sysint_t*> (var -> value)) = newValue;
+    return 0;
 }
 
 bool JitCompiler::Push ()
@@ -310,6 +325,20 @@ bool JitCompiler::Ret ()
 {
     compiler -> ret ();
 } 
+
+bool JitCompiler::PopPtr()
+{
+    compiler -> mov  (AsmJit::rdi, reinterpret_cast <sysuint_t> (execCmds [executingCmd] -> stringArgs [0]));
+    compiler -> pop  (AsmJit::rsi);
+    compiler -> call ((void*)pushValueToPointer);
+}
+
+bool JitCompiler::PushPtr()
+{
+    compiler -> mov  (AsmJit::rdi, reinterpret_cast <sysuint_t> (execCmds [executingCmd] -> stringArgs [0]));
+    compiler -> call ((void*)returnPointerToVariable);
+    compiler -> push (AsmJit::rax);
+}
 
 bool JitCompiler::Print()
 {

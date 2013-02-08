@@ -38,6 +38,8 @@ namespace Commands
     const int PRINT       = 33;
     const int NEWLINE     = 34;
     const int NEWWORD     = 35;
+    const int PUSHPTR     = 36;
+    const int POPPTR      = 37;
 };
 
 

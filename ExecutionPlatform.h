@@ -55,4 +55,6 @@ public:
     virtual bool Print               () = 0;
     virtual bool NewLine             () = 0;
     virtual bool NewWord             () = 0;
+    virtual bool PushPtr             () = 0;
+    virtual bool PopPtr              () = 0;
 };

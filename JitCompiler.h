@@ -55,9 +55,12 @@ public:
     bool Ret                   ();
     bool Print                 ();
     bool NewLine               ();
-    bool NewWord               ();  
+    bool NewWord               ();
+    bool PushPtr               ();
+    bool PopPtr                ();
+    
     bool DeclareAllLabels      ();
-    bool ProcessJumpCommands          ();
+    bool ProcessJumpCommands   ();
 };
 
 #endif
