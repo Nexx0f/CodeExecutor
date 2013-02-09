@@ -5,14 +5,14 @@
 #include "executor-stack_variables.h"
 #include <map>
 #include <string>
-#include "AsmJit/AsmJit.h"
+#include "JitPlatform.h"
 
 class JitCompiler: public ExecutionPlatform
 {  
 public:
-    
-    AsmJit::Assembler*                    compiler;
-    std::map <std::string, AsmJit::Label> labelsData;
+    JitPlatform*                  compiler;
+    //AsmJit::Assembler*                    compiler;
+    std::map <std::string, label> labelsData;
     VariablesData*                        varData;
     
 public:  

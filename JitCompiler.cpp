@@ -8,7 +8,7 @@ VariablesData* variablesData;
 
 JitCompiler::JitCompiler (): ExecutionPlatform ()
 {   
-    compiler = new AsmJit::Assembler;
+    compiler = new JitPlatform;
     variablesData = new VariablesData;
     varData = variablesData;
     
@@ -48,7 +48,7 @@ JitCompiler::JitCompiler (): ExecutionPlatform ()
     BIND_FUNCTION (Commands::NEWLINE,   &ExecutionPlatform::NewLine);
     BIND_FUNCTION (Commands::NEWWORD,   &ExecutionPlatform::NewWord);
     BIND_FUNCTION (Commands::PUSHPTR,   &ExecutionPlatform::PushPtr);
-    BIND_FUNCTION (Commands::POPPTR,   &ExecutionPlatform::PopPtr);
+    BIND_FUNCTION (Commands::POPPTR,    &ExecutionPlatform::PopPtr);
     
     #undef BIND_FUNCTION
 }
@@ -111,14 +111,14 @@ bool JitCompiler::Push ()
 bool JitCompiler::Label ()
 {
     std::string stringToFind (execCmds [executingCmd] -> stringArgs [0]);
-    std::map <std::string, AsmJit::Label>::const_iterator foundLabel = labelsData.find (stringToFind);
+    std::map <std::string, label>::const_iterator foundLabel = labelsData.find (stringToFind);
     compiler -> bind (foundLabel -> second);
 }
 
 bool JitCompiler::Jmp ()
 {
     std::string stringToFind (execCmds [executingCmd] -> stringArgs [0]);
-    std::map <std::string, AsmJit::Label>::const_iterator foundLabel = labelsData.find (stringToFind);
+    std::map <std::string, label>::const_iterator foundLabel = labelsData.find (stringToFind);
     compiler -> jmp (foundLabel -> second);
 }
 
@@ -155,28 +155,28 @@ bool JitCompiler::Jne ()
 bool JitCompiler::Call ()
 {
     std::string stringToFind (execCmds [executingCmd] -> stringArgs [0]);
-    std::map <std::string, AsmJit::Label>::const_iterator foundLabel = labelsData.find (stringToFind);
+    std::map <std::string, label>::const_iterator foundLabel = labelsData.find (stringToFind);
     compiler -> call (foundLabel -> second);
 }
 
 bool JitCompiler::ProcessJumpCommands ()
 {
     std::string stringToFind (execCmds [executingCmd] -> stringArgs [0]);
-    std::map <std::string, AsmJit::Label>::const_iterator foundLabel = labelsData.find (stringToFind);
+    std::map <std::string, label>::const_iterator foundLabel = labelsData.find (stringToFind);
     
-    compiler -> pop  (AsmJit::rax);
-    compiler -> pop  (AsmJit::rbx);
-    compiler -> cmp  (AsmJit::rax, AsmJit::rbx);
-    compiler -> push (AsmJit::rbx);
-    compiler -> push (AsmJit::rax);
+    compiler -> pop  (compiler -> rax);
+    compiler -> pop  (compiler -> rbx);
+    compiler -> cmp  (compiler -> rax, compiler -> rbx);
+    compiler -> push (compiler -> rbx);
+    compiler -> push (compiler -> rax);
     
-    if (execCmds [executingCmd] -> cmdNumber == Commands::JE)  compiler -> je   (foundLabel -> second);
+    if (execCmds [executingCmd] -> cmdNumber == Commands::JE)  compiler -> je    (foundLabel -> second);
     else
-    if (execCmds [executingCmd] -> cmdNumber == Commands::JA)  compiler -> ja   (foundLabel -> second);
+    if (execCmds [executingCmd] -> cmdNumber == Commands::JA)  compiler -> ja    (foundLabel -> second);
     else        
     if (execCmds [executingCmd] -> cmdNumber == Commands::JAE) compiler -> jae   (foundLabel -> second);
     else        
-    if (execCmds [executingCmd] -> cmdNumber == Commands::JB)  compiler -> jb   (foundLabel -> second);
+    if (execCmds [executingCmd] -> cmdNumber == Commands::JB)  compiler -> jb    (foundLabel -> second);
     else        
     if (execCmds [executingCmd] -> cmdNumber == Commands::JBE) compiler -> jbe   (foundLabel -> second);
     else        
@@ -189,48 +189,48 @@ bool JitCompiler::Dump ()
 
 bool JitCompiler::Add ()
 {
-    compiler -> pop  (AsmJit::rax);
-    compiler -> pop  (AsmJit::rbx);
-    compiler -> add  (AsmJit::rax, AsmJit::rbx);
-    compiler -> push (AsmJit::rax);
+    compiler -> pop  (compiler -> rax);
+    compiler -> pop  (compiler -> rbx);
+    compiler -> add  (compiler -> rax, compiler -> rbx);
+    compiler -> push (compiler -> rax);
 } 
 
 bool JitCompiler::Sub ()
 {
-    compiler -> pop  (AsmJit::rax);
-    compiler -> pop  (AsmJit::rbx);
-    compiler -> sub  (AsmJit::rax, AsmJit::rbx);
-    compiler -> push (AsmJit::rax);    
+    compiler -> pop  (compiler -> rax);
+    compiler -> pop  (compiler -> rbx);
+    compiler -> sub  (compiler -> rax, compiler -> rbx);
+    compiler -> push (compiler -> rax);    
 } 
 
 bool JitCompiler::Mul ()
 {
-    compiler -> pop   (AsmJit::rax);
-    compiler -> pop   (AsmJit::rbx);
-    compiler -> imul  (AsmJit::rbx);
-    compiler -> push  (AsmJit::rax);
+    compiler -> pop   (compiler -> rax);
+    compiler -> pop   (compiler -> rbx);
+    compiler -> imul  (compiler -> rbx);
+    compiler -> push  (compiler -> rax);
 } 
 
 bool JitCompiler::Div ()
 {
-     compiler -> pop   (AsmJit::rax);
-     compiler -> pop   (AsmJit::rbx);
+     compiler -> pop   (compiler -> rax);
+     compiler -> pop   (compiler -> rbx);
      compiler -> cdqe  ();
-     compiler -> idiv  (AsmJit::rbx);
-     compiler -> push  (AsmJit::rax);    
+     compiler -> idiv  (compiler -> rbx);
+     compiler -> push  (compiler -> rax);    
 } 
 
 bool JitCompiler::Top ()
 {
-    compiler -> mov  (AsmJit::rdi, AsmJit::rsp);
+    compiler -> mov  (compiler -> rdi, compiler -> rsp);
     compiler -> call ((void*)printNumber);    
 } 
 
 bool JitCompiler::Dup ()
 {
-    compiler -> pop  (AsmJit::rax);
-    compiler -> push (AsmJit::rax);
-    compiler -> push (AsmJit::rax);
+    compiler -> pop  (compiler -> rax);
+    compiler -> push (compiler -> rax);
+    compiler -> push (compiler -> rax);
 } 
 
 bool JitCompiler::Clear ()
@@ -243,7 +243,7 @@ bool JitCompiler::Cls ()
 
 bool JitCompiler::Pop ()
 {
-   compiler -> pop (AsmJit::rbx);
+   compiler -> pop (compiler -> rbx);
 }
 
 bool JitCompiler::Getch ()
@@ -252,22 +252,22 @@ bool JitCompiler::Getch ()
 
 bool JitCompiler::Decl ()
 {
-    compiler -> mov (AsmJit::rdi, reinterpret_cast <sysuint_t> (execCmds [executingCmd] -> stringArgs [0]));
+    compiler -> mov (compiler -> rdi, reinterpret_cast <sysuint_t> (execCmds [executingCmd] -> stringArgs [0]));
     compiler -> call ((void*)addVariableToData);
 }
 
 bool JitCompiler::Popto ()
 { 
-    compiler -> mov  (AsmJit::rdi, reinterpret_cast <sysuint_t> (execCmds [executingCmd] -> stringArgs [0]));
-    compiler -> pop  (AsmJit::rsi);
+    compiler -> mov  (compiler -> rdi, reinterpret_cast <sysuint_t> (execCmds [executingCmd] -> stringArgs [0]));
+    compiler -> pop  (compiler -> rsi);
     compiler -> call ((void*)equateVariable);
 } 
 
 bool JitCompiler::Pushfrom ()
 {
-    compiler -> mov (AsmJit::rdi, reinterpret_cast <sysuint_t> (execCmds [executingCmd] -> stringArgs [0]));
+    compiler -> mov  (compiler -> rdi, reinterpret_cast <sysuint_t> (execCmds [executingCmd] -> stringArgs [0]));
     compiler -> call ((void*)returnValueOfVariable);
-    compiler -> push (AsmJit::rax);
+    compiler -> push (compiler -> rax);
 } 
 
 bool JitCompiler::Moreequal ()
@@ -302,23 +302,23 @@ bool JitCompiler::NotEqual()
 
 bool JitCompiler::ComparisonCommands ()
 {
-    compiler -> pop  (AsmJit::rax);
-    compiler -> pop  (AsmJit::rbx);
-    compiler -> cmp  (AsmJit::rax, AsmJit::rbx);
+    compiler -> pop  (compiler -> rax);
+    compiler -> pop  (compiler -> rbx);
+    compiler -> cmp  (compiler -> rax, compiler -> rbx);
     
-    if (execCmds [executingCmd] -> cmdNumber == Commands::EQUAL)     compiler -> sete (AsmJit::rax);
+    if (execCmds [executingCmd] -> cmdNumber == Commands::EQUAL)     compiler -> sete (compiler -> rax);
     else
-    if (execCmds [executingCmd] -> cmdNumber == Commands::NOTEQUAL)  compiler -> setne (AsmJit::rax);
+    if (execCmds [executingCmd] -> cmdNumber == Commands::NOTEQUAL)  compiler -> setne (compiler -> rax);
     else
-    if (execCmds [executingCmd] -> cmdNumber == Commands::MORE)      compiler -> setg (AsmJit::rax);
+    if (execCmds [executingCmd] -> cmdNumber == Commands::MORE)      compiler -> setg (compiler -> rax);
     else
-    if (execCmds [executingCmd] -> cmdNumber == Commands::MOREEQUAL) compiler -> setge (AsmJit::rax);
+    if (execCmds [executingCmd] -> cmdNumber == Commands::MOREEQUAL) compiler -> setge (compiler -> rax);
     else
-    if (execCmds [executingCmd] -> cmdNumber == Commands::LESS)      compiler -> setl (AsmJit::rax);
+    if (execCmds [executingCmd] -> cmdNumber == Commands::LESS)      compiler -> setl (compiler -> rax);
     else
-    if (execCmds [executingCmd] -> cmdNumber == Commands::LESSEQUAL) compiler -> setle (AsmJit::rax);
+    if (execCmds [executingCmd] -> cmdNumber == Commands::LESSEQUAL) compiler -> setle (compiler -> rax);
     
-    compiler -> push (AsmJit::rax);
+    compiler -> push (compiler -> rax);
 } 
 
 bool JitCompiler::Ret ()
@@ -328,33 +328,33 @@ bool JitCompiler::Ret ()
 
 bool JitCompiler::PopPtr()
 {
-    compiler -> mov  (AsmJit::rdi, reinterpret_cast <sysuint_t> (execCmds [executingCmd] -> stringArgs [0]));
-    compiler -> pop  (AsmJit::rsi);
+    compiler -> mov  (compiler -> rdi, reinterpret_cast <sysuint_t> (execCmds [executingCmd] -> stringArgs [0]));
+    compiler -> pop  (compiler -> rsi);
     compiler -> call ((void*)pushValueToPointer);
 }
 
 bool JitCompiler::PushPtr()
 {
-    compiler -> mov  (AsmJit::rdi, reinterpret_cast <sysuint_t> (execCmds [executingCmd] -> stringArgs [0]));
+    compiler -> mov  (compiler -> rdi, reinterpret_cast <sysuint_t> (execCmds [executingCmd] -> stringArgs [0]));
     compiler -> call ((void*)returnPointerToVariable);
-    compiler -> push (AsmJit::rax);
+    compiler -> push (compiler -> rax);
 }
 
 bool JitCompiler::Print()
 {
-    compiler -> mov (AsmJit::rdi, reinterpret_cast <sysuint_t> (execCmds [executingCmd] -> stringArgs [0]));
+    compiler -> mov (compiler -> rdi, reinterpret_cast <sysuint_t> (execCmds [executingCmd] -> stringArgs [0]));
     compiler -> call ((void*)printWord); 
 }
 
 bool JitCompiler::NewLine()
 {   
-    compiler -> mov (AsmJit::rdi, reinterpret_cast <sysuint_t> ("\n"));
+    compiler -> mov (compiler -> rdi, reinterpret_cast <sysuint_t> ("\n"));
     compiler -> call ((void*)printWord); 
 }
 
 bool JitCompiler::NewWord()
 {
-    compiler -> mov (AsmJit::rdi, reinterpret_cast <sysuint_t> (" "));
+    compiler -> mov (compiler -> rdi, reinterpret_cast <sysuint_t> (" "));
     compiler -> call ((void*)printWord);
 }
 
@@ -372,17 +372,16 @@ bool JitCompiler::DeclareAllLabels()
 resultFunction JitCompiler::Execute()
 {
     using namespace Commands;
-    using namespace AsmJit;
     
-    compiler -> push (nbp);
-    compiler -> mov  (nbp, nsp);
+    compiler -> push (compiler -> nbp);
+    compiler -> mov  (compiler -> nbp, compiler -> nsp);
     
     DeclareAllLabels (); 
      
     while (executingCmd < execCmds.size())
     {
         if (executeFunctions [execCmds [executingCmd] -> cmdNumber] != NULL)    
-            (this ->* executeFunctions [execCmds [executingCmd] -> cmdNumber]) ();
+           (this ->* executeFunctions [execCmds [executingCmd] -> cmdNumber]) ();
         else
         {
             char errData [256];
@@ -394,12 +393,12 @@ resultFunction JitCompiler::Execute()
     }    
     executingCmd = 0;
     
-    compiler -> mov(nax, 0);
+    compiler -> mov(compiler -> nax, 0);
 
-    compiler -> mov(nsp, nbp);
-    compiler -> pop(nbp);
+    compiler -> mov(compiler -> nsp, compiler ->nbp);
+    compiler -> pop(compiler -> nbp);
 
     compiler -> ret();
     
-    return function_cast <resultFunction> (compiler -> make ());
+    return AsmJit::function_cast <resultFunction> (compiler -> compiler -> make ());
 }

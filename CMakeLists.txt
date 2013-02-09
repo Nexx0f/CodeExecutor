@@ -20,5 +20,5 @@ add_executable(codeexecutor ${ASMJIT_SOURCES} codeblock.cpp
                             Executor.cpp executor-stack_variables.cpp
                             ExecutableCommand.cpp commands.cpp
                             ExecutionPlatform.cpp  JitCompiler.cpp
-                            main.cpp)
+                            JitPlatform.cpp main.cpp)
 
