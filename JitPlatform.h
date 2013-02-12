@@ -1,4 +1,5 @@
 #include "AsmJit/AsmJit.h"
+#include <map>
 
 typedef AsmJit::GPReg reg;
 typedef AsmJit::Label label;
@@ -8,17 +9,20 @@ class JitPlatform
 public:
     AsmJit::Assembler* compiler;
     
+    int cmdsAmount;
+    
     const reg&  rax;
     const reg&  rbx;
     const reg&  rsp;
-    const reg&  nbp;
     const reg&  rsi;
     const reg&  rdi;
-    const reg&  nsp;
-    const reg&  nax;    
+    const reg&  rbp;
     
-          JitPlatform ();
+    std::map <int, const char*> regNames;
     
+          JitPlatform        ();
+    const char* findRegName (int id);
+          
     void  mov      (const reg& dst, const reg&     src);
     void  mov      (const reg& dst, const sysint_t src);
     void  mov      (const reg& dst, const sysuint_t src);

@@ -4,6 +4,14 @@
 #include <iostream>
 #include <fstream>
 
+#define DEBUG
+
+#ifdef DEBUG
+    #define $ if(true)
+#else
+    #define $ if(false)
+#endif
+
 VariablesData* variablesData;
 
 JitCompiler::JitCompiler (): ExecutionPlatform ()
@@ -373,8 +381,10 @@ resultFunction JitCompiler::Execute()
 {
     using namespace Commands;
     
-    compiler -> push (compiler -> nbp);
-    compiler -> mov  (compiler -> nbp, compiler -> nsp);
+    $ puts ("\nTranslated code:\n");
+    
+    compiler -> push (compiler -> rbp);
+    compiler -> mov  (compiler -> rbp, compiler -> rsp);
     
     DeclareAllLabels (); 
      
@@ -393,12 +403,15 @@ resultFunction JitCompiler::Execute()
     }    
     executingCmd = 0;
     
-    compiler -> mov(compiler -> nax, 0);
+    compiler -> mov(compiler -> rax, 0);
 
-    compiler -> mov(compiler -> nsp, compiler ->nbp);
-    compiler -> pop(compiler -> nbp);
+    compiler -> mov(compiler -> rsp, compiler -> rbp);
+    compiler -> pop(compiler -> rbp);
 
     compiler -> ret();
+    
+    printf ("\nAmount of commands and amount after translating ratio: %d/%d\n",
+            execCmds.size(), compiler -> cmdsAmount);
     
     return AsmJit::function_cast <resultFunction> (compiler -> compiler -> make ());
 }
