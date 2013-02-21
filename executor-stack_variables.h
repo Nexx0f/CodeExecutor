@@ -2,6 +2,8 @@
 #define H_EXECUTOR-STACK_VARIABLES
 
 #include <vector>
+#include <map>
+#include <string>
 #include "AsmJit/AsmJit.h"
 
 struct Variable
@@ -13,7 +15,7 @@ struct Variable
 class VariablesData
 {
 public:
-    std::vector <Variable> data;
+    std::map <std::string, Variable> data;
     int                    currAmountVar;
      
 public:    
@@ -28,16 +30,16 @@ public:
 class Stack
 {
 public:  
-   std::vector <int> data;
+   std::vector <sysint_t> data;
    
 public:
         Stack            ();
        ~Stack            ();
     
-   int  Push             (int num);
-   int  Pop              (); 
-   int  Top              ();
-   void Dump             ();  
+   int       Push             (sysint_t num);
+   sysint_t  Pop              (); 
+   int       Top              ();
+   void      Dump             ();  
 };
 
 #endif

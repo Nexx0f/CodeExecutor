@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <vector>
 
+#ifndef H_EXECUTABLE_COMMAND
+#define H_EXECUTABLE_COMMAND
+
 /*CodeBlock create list of executable
   commands after parsing input code.
   Data of objects of this class determines
@@ -23,3 +26,4 @@ public:
     bool  printExecuteInformation (FILE* ouF);
 };
  
+#endif

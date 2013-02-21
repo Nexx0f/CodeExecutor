@@ -11,9 +11,8 @@ class JitCompiler: public ExecutionPlatform
 {  
 public:
     JitPlatform*                  compiler;
-    //AsmJit::Assembler*                    compiler;
     std::map <std::string, label> labelsData;
-    VariablesData*                        varData;
+    VariablesData*                varData;
     
 public:  
          JitCompiler ();

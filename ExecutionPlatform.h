@@ -1,6 +1,9 @@
 #include "commands.h"
 #include "ExecutableCommand.h"
 
+#ifndef H_EXECUTION_PLATFORM
+#define H_EXECUTION_PLATFORM
+
 class ExecutionPlatform;
 
 typedef int (*resultFunction)();
@@ -58,3 +61,5 @@ public:
     virtual bool PushPtr             () = 0;
     virtual bool PopPtr              () = 0;
 };
+
+#endif

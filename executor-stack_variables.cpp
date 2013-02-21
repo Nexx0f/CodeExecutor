@@ -20,34 +20,37 @@ VariablesData::~VariablesData()
  
 void VariablesData::PushVar (Variable newVar)
 {
-    data.push_back (newVar);
-    currAmountVar++;
-
+    //data.push_back (newVar);
+    //currAmountVar++;
+    std::string newName (newVar.name);
+    data [newName] = newVar;
 }
 
 Variable* VariablesData::FindVar (const char* name)
 {
-    for (int i = currAmountVar - 1; i >= 0; i--)
+    std::string needName (name);
+    std::map <std::string, Variable>::iterator foundVar = data.find(needName);      
+    
+    if (foundVar == data.end())
     {
-        if (!strcmp (data[i].name, name)) return &data[i];
+        char errorStr [256] = "";
+        sprintf (errorStr, "Variable \"%s\" not declared", name);
+          
+        MessageAboutError (errorStr);
     }
-          
-          
-    char errorStr [256] = "";
-    sprintf (errorStr, "Variable \"%s\" not declared", name);
-          
-    MessageAboutError (errorStr);
+    else return &(foundVar -> second);
 }
 
 void VariablesData::DumpDeclaredVar()
 {
-    puts ("\n\n\n\n\n\n");
-    for (int i = 0; i < currAmountVar; i++)
-    {
-        puts ("\nVariable\n{\n");
-        printf ("    name  - \"%s\" \n"
-                "    value - %d\n}\n", data[i].name, data[i].value);
-    }
+   // puts ("\n\n\n\n\n\n");
+   // for (int i = 0; i < currAmountVar; i++)
+   // {
+   //     puts ("\nVariable\n{\n");
+   //     printf ("    name  - \"%s\" \n"
+   //             "    value - %d\n}\n", data[i].name, data[i].value);
+   // }
+   
 }
 
 /////=================================
@@ -62,18 +65,20 @@ Stack::~Stack()
 {
 }
 
-int Stack::Push (int num)
+int Stack::Push (sysint_t num)
 {
     data.push_back (num);
 }
     
-int Stack::Pop()
+sysint_t Stack::Pop()
 {
-    int num = 0;
-    num = data[data.size()-1];
+    //printf ("\nProcess pop; Size - %d\n", data.size());
     
     if (data.size() == 0)
         MessageAboutError ("Stack underflown!");
+        
+    sysint_t num = 0;
+    num = data[data.size()-1];
     
     data.pop_back();
     return num;
@@ -81,7 +86,7 @@ int Stack::Pop()
 
 int Stack::Top()
 {
-    int num = 0;
+    sysint_t num = 0;
     num = data[data.size() - 1];
 
     return num; 

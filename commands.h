@@ -1,6 +1,9 @@
 #include <map>
 #include <string>
 
+#ifndef H_COMMANDS
+#define H_COMMANDS
+
 namespace Commands 
 {
     const int PUSH        = 1; 
@@ -69,4 +72,4 @@ public:
     CommandDeclaration*  FindCommand       (std::string name);
     void                PrintCommandsList ();
 };
-
+#endif

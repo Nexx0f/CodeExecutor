@@ -8,7 +8,7 @@ class JitPlatform
 {
 public:
     AsmJit::Assembler* compiler;
-    
+            
     int cmdsAmount;
     
     const reg&  rax;

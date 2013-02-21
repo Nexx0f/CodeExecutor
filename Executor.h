@@ -1,5 +1,7 @@
 #include "executor-stack_variables.h"
 #include "ExecutionPlatform.h"
+#include <map>
+#include <string>
 
 class Executor: public ExecutionPlatform
 {
@@ -7,6 +9,7 @@ private:
     VariablesData* varData;
     Stack*         stack;
     Stack          retStack;
+    std::map <sysint_t, sysint_t*> pointersData;
     
 public:  
          Executor ();
@@ -51,4 +54,6 @@ public:
     bool NewLine             ();
     bool NewWord             ();
     bool DeclareAllVariables ();  
+    bool PushPtr             ();
+    bool PopPtr              ();
 };

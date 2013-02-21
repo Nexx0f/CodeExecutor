@@ -4,6 +4,14 @@
 #include <iostream>
 #include <fstream>
 
+#define DEBUG_EXECUTOR
+
+#ifdef DEBUG_EXECUTOR
+    #define $ if(true)
+#else
+    #define $ if(false)
+#endif
+
 Executor::Executor (): ExecutionPlatform ()
 {
     stack = new Stack;
@@ -44,6 +52,8 @@ Executor::Executor (): ExecutionPlatform ()
     BIND_FUNCTION (Commands::PRINT,     &ExecutionPlatform::Print);
     BIND_FUNCTION (Commands::NEWLINE,   &ExecutionPlatform::NewLine);
     BIND_FUNCTION (Commands::NEWWORD,   &ExecutionPlatform::NewWord);
+    BIND_FUNCTION (Commands::PUSHPTR,   &ExecutionPlatform::PushPtr);
+    BIND_FUNCTION (Commands::POPPTR,    &ExecutionPlatform::PopPtr);
     
     #undef BIND_FUNCTION
 }
@@ -54,15 +64,37 @@ Executor::~Executor()
     delete stack;
 }
 
+bool Executor::PopPtr()
+{
+    sysint_t    newValue = stack -> Pop ();
+    Variable*   var = varData -> FindVar(execCmds [executingCmd] -> stringArgs [0]);
+    
+    std::map <sysint_t, sysint_t*>::const_iterator foundPtr = pointersData.find (var -> value);
+    if (foundPtr == pointersData.end()) printf ("\nIncorrect pointer\n");
+    
+    *(foundPtr -> second) = newValue;
+    
+}
+
+bool Executor::PushPtr()
+{
+    Variable* varToPush = varData -> FindVar (execCmds [executingCmd] -> stringArgs [0]);
+    stack -> Push (reinterpret_cast <sysint_t> (&(varToPush -> value)));
+    pointersData [reinterpret_cast <sysint_t> (&(varToPush -> value))] = &(varToPush -> value);
+}
+
+
 bool Executor::Push ()
 {
-    int newDataToPushToStack = execCmds[executingCmd] -> intArgs[0];
+    sysint_t newDataToPushToStack = execCmds[executingCmd] -> intArgs[0];
     stack -> Push (newDataToPushToStack);
+    //printf ("\nProcessing push %d\n", newDataToPushToStack);
 }
 
 bool Executor::Label ()
 {
     // Nothing to do. Label place will be found during JMP command execution
+    //printf ("\nLabel created!\n");
 }
 
 bool Executor::Jmp ()
@@ -124,7 +156,7 @@ bool Executor::JumpCommands ()
         
         for (int i = 0; i < execCmds.size(); i++)
                 if (execCmds [i] -> cmdNumber == Commands::LABEL &&
-                    !strcmp (execCmds[i] -> stringArgs[0], execCmds[i] -> stringArgs[0]))
+                    !strcmp (execCmds[executingCmd] -> stringArgs[0], execCmds[i] -> stringArgs[0]))
                     placeOfLabelToJump = i;
         
         // If command LABEL was not found - Error!     
@@ -341,7 +373,10 @@ resultFunction Executor::Execute()
     {
         if (executeFunctions [execCmds [executingCmd] -> cmdNumber] != NULL)  
             if (executeFunctions [execCmds [executingCmd] -> cmdNumber] != NULL)
+            {
+                //printf ("Number of executing command - %d", executingCmd);
                 (this ->* executeFunctions [execCmds [executingCmd] -> cmdNumber]) ();
+            }
             else
             {
                 printf ("\n\nExecution error:\n"

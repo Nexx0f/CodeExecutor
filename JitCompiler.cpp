@@ -390,8 +390,10 @@ resultFunction JitCompiler::Execute()
      
     while (executingCmd < execCmds.size())
     {
-        if (executeFunctions [execCmds [executingCmd] -> cmdNumber] != NULL)    
+        if (executeFunctions [execCmds [executingCmd] -> cmdNumber] != NULL)
+        {
            (this ->* executeFunctions [execCmds [executingCmd] -> cmdNumber]) ();
+        }
         else
         {
             char errData [256];
