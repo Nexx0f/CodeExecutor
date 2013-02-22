@@ -16,9 +16,11 @@ Set(ASMJIT_SOURCES
   AsmJit/Util.cpp
 )
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
 add_executable(codeexecutor ${ASMJIT_SOURCES} codeblock.cpp
                             Executor.cpp executor-stack_variables.cpp
                             ExecutableCommand.cpp commands.cpp
                             ExecutionPlatform.cpp  JitCompiler.cpp
-                            JitPlatform.cpp main.cpp)
+                            JitPlatform.cpp CodeGeneratorBackend.cpp main.cpp)
 

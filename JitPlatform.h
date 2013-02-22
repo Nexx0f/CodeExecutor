@@ -23,8 +23,8 @@ public:
           JitPlatform        ();
     const char* findRegName (int id);
           
-    void  mov      (const reg& dst, const reg&     src);
-    void  mov      (const reg& dst, const sysint_t src);
+    void  mov      (const reg& dst, const reg&      src);
+    void  mov      (const reg& dst, const sysint_t  src);
     void  mov      (const reg& dst, const sysuint_t src);
     void  mov      (const reg& dst, const int       src);
     
