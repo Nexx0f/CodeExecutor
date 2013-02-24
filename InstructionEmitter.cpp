@@ -78,6 +78,23 @@ bool InstructionEmitter::emitInstruction (opcode _opcode, GPReg dest, sysint_t s
     byteData -> emitImmediate <sysint_t> (src);
 }
 
+bool InstructionEmitter::emitInstruction (opcode _opcode, GPReg dest, sysuint_t src)
+{
+    byteData -> emitByte (BIN (1001000));
+    
+    int opcodeLength = _opcode.size();
+    opcode::iterator opcode_it = _opcode.begin();
+    
+    for (int i = 0; i < opcodeLength; i++)
+    {
+        if (i == opcodeLength - 1) byteData -> emitByte (*opcode_it + dest);
+        else                       byteData -> emitByte (*opcode_it);
+        ++opcode_it;
+    }
+    
+    byteData -> emitImmediate <sysuint_t> (src);
+}
+
 bool InstructionEmitter::emitInstruction (opcode _opcode, int rmField, GPReg dest)
 {
     int rmByte = 11;
@@ -94,6 +111,13 @@ bool InstructionEmitter::emitInstruction(opcode _opcode, sysint_t dest)
     byteData -> emitByte                 (BIN (1001000));
     byteData -> emitOpcode               (_opcode);
     byteData -> emitImmediate <int32_t> (dest);
+}
+
+bool InstructionEmitter::emitInstruction(opcode _opcode, sysuint_t dest)
+{
+    byteData -> emitByte                 (BIN (1001000));
+    byteData -> emitOpcode               (_opcode);
+    byteData -> emitImmediate <uint32_t> (dest);
 }
 
 bool InstructionEmitter::emitInstruction (opcode _opcode)

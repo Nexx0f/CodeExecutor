@@ -21,6 +21,14 @@ CodeGeneratorBackend::CodeGeneratorBackend()
     
     instPopReg    = {{0x8F}, 0};
     
+    instCmpRegReg = {{0x3B}, 0};
+    instSeteReg   = {{0x0F, 0x94}, 0};
+    instSetneReg  = {{0x0F, 0x95}, 0};
+    instSetgReg   = {{0x0F, 0x9F}, 0};
+    instSetgeReg  = {{0x0F, 0x9D}, 0};
+    instSetlReg   = {{0x0F, 0x9C}, 0};
+    instSetleReg  = {{0x0F, 0x9E}, 0};
+    
     instRet       = {{0xC3}, 0};
 }
 
@@ -54,6 +62,11 @@ void CodeGeneratorBackend::emitMov(GPReg dest, sysint_t src)
     instructionEmitter -> emitInstruction (instMovRegImm._opcode, dest, src);
 }
 
+void CodeGeneratorBackend::emitMov(GPReg dest, sysuint_t src)
+{
+    instructionEmitter -> emitInstruction (instMovRegImm._opcode, dest, src);
+}
+
 void CodeGeneratorBackend::emitPush(GPReg dest)
 {
     instructionEmitter -> emitInstruction (instPushReg._opcode, instPushReg.rmField, dest);
@@ -64,9 +77,50 @@ void CodeGeneratorBackend::emitPush(sysint_t dest)
     instructionEmitter -> emitInstruction (instPushImm._opcode, dest);
 }
 
+void CodeGeneratorBackend::emitPush(sysuint_t dest)
+{
+    instructionEmitter -> emitInstruction (instPushImm._opcode, dest);
+}
+
 void CodeGeneratorBackend::emitPop(GPReg dest)
 {
     instructionEmitter -> emitInstruction (instPopReg._opcode, instPopReg.rmField, dest);
+}
+
+void CodeGeneratorBackend::emitCmp(GPReg dest, GPReg src)
+{
+    instructionEmitter -> emitInstruction (instCmpRegReg._opcode, dest, src);
+}
+
+void CodeGeneratorBackend::emitSete(GPReg dest)
+{
+    instructionEmitter -> emitInstruction (instSeteReg._opcode, instSeteReg.rmField, dest);
+}
+
+void CodeGeneratorBackend::emitSetne(GPReg dest)
+{
+    instructionEmitter -> emitInstruction (instSetneReg._opcode, instSetneReg.rmField, dest);
+}
+
+void CodeGeneratorBackend::emitSetg(GPReg dest)
+{
+    instructionEmitter -> emitInstruction (instSetgReg._opcode, instSetgReg.rmField, dest);
+}
+
+void CodeGeneratorBackend::emitSetge(GPReg dest)
+{
+    instructionEmitter -> emitInstruction (instSetgeReg._opcode, instSetgeReg.rmField, dest);
+
+}
+
+void CodeGeneratorBackend::emitSetl(GPReg dest)
+{
+    instructionEmitter -> emitInstruction (instSetlReg._opcode, instSetlReg.rmField, dest);
+}
+
+void CodeGeneratorBackend::emitSetle(GPReg dest)
+{
+    instructionEmitter -> emitInstruction (instSetleReg._opcode, instSetleReg.rmField, dest);
 }
 
 void CodeGeneratorBackend::emitRet()

@@ -31,21 +31,39 @@ public:
     
     Instruction instPopReg;
     
+    Instruction instCmpRegReg;
+    Instruction instSeteReg;
+    Instruction instSetneReg;
+    Instruction instSetgReg;
+    Instruction instSetgeReg;
+    Instruction instSetlReg;
+    Instruction instSetleReg;
+    
     Instruction instRet;
     
 public:
     CodeGeneratorBackend ();  
    ~CodeGeneratorBackend ();
     
-    void        emitMov  (GPReg dest, GPReg    src);
-    void        emitMov  (GPReg dest, sysint_t src);
+    void        emitMov   (GPReg dest, GPReg     src);
+    void        emitMov   (GPReg dest, sysint_t  src);
+    void        emitMov   (GPReg dest, sysuint_t src);
     
-    void        emitPush (GPReg    dest);
-    void        emitPush (sysint_t dest);
+    void        emitPush  (GPReg     dest);
+    void        emitPush  (sysint_t  dest);
+    void        emitPush  (sysuint_t dest);
     
-    void        emitPop  (GPReg dest);
+    void        emitPop   (GPReg dest);
     
-    void        emitRet  ();
+    void        emitCmp   (GPReg dest, GPReg src);
+    void        emitSete  (GPReg dest);
+    void        emitSetne (GPReg dest);
+    void        emitSetg  (GPReg dest);
+    void        emitSetge (GPReg dest);
+    void        emitSetl  (GPReg dest);
+    void        emitSetle (GPReg dest);
+    
+    void        emitRet   ();
     
     ResFunction make     ();
 };
