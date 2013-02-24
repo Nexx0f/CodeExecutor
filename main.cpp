@@ -15,17 +15,10 @@ int main(int argc, char **argv)
     
     CodeGeneratorBackend assembler;
     
-    assembler.emitPush  ((sysint_t)191);
-    assembler.emitPop   (assembler.rax);
-    assembler.emitMov   (assembler.rcx, (sysint_t)191);
-    assembler.emitMov   (assembler.rax, assembler.rcx);
-    assembler.emitCmp   (assembler.rax, assembler.rcx);
-    assembler.emitSete  (assembler.rax);
-    assembler.emitSetne (assembler.rax);
-    assembler.emitSetg  (assembler.rax);
-    assembler.emitSetge (assembler.rax);
-    assembler.emitSetl  (assembler.rax);
-    assembler.emitSetle (assembler.rax);
+    assembler.emitMov   (assembler.rax, (sysint_t)4100);
+    assembler.emitMov   (assembler.rbx, (sysint_t)-100);
+    assembler.emitMov   (assembler.rdx, (sysint_t)0);
+    assembler.emitIdiv  (assembler.rbx);
     assembler.emitRet   ();
     
     ResFunction f = assembler.make();

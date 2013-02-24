@@ -29,6 +29,12 @@ CodeGeneratorBackend::CodeGeneratorBackend()
     instSetlReg   = {{0x0F, 0x9C}, 0};
     instSetleReg  = {{0x0F, 0x9E}, 0};
     
+    instAddRegReg = {{0x03}, 0};
+    instSubRegReg = {{0x2B}, 0};
+    instImulReg   = {{0xF7}, 5};
+    instIdivReg   = {{0xF7}, 7};
+    instCdqe      = {{0x98}, 0};
+    
     instRet       = {{0xC3}, 0};
 }
 
@@ -121,6 +127,31 @@ void CodeGeneratorBackend::emitSetl(GPReg dest)
 void CodeGeneratorBackend::emitSetle(GPReg dest)
 {
     instructionEmitter -> emitInstruction (instSetleReg._opcode, instSetleReg.rmField, dest);
+}
+
+void CodeGeneratorBackend::emitAdd(GPReg dest, GPReg src)
+{
+    instructionEmitter -> emitInstruction (instAddRegReg._opcode, dest, src);
+}
+
+void CodeGeneratorBackend::emitSub(GPReg dest, GPReg src)
+{
+    instructionEmitter -> emitInstruction (instSubRegReg._opcode, dest, src);
+}
+
+void CodeGeneratorBackend::emitImul(GPReg dest)
+{
+    instructionEmitter -> emitInstruction (instImulReg._opcode, instImulReg.rmField, dest);
+}
+
+void CodeGeneratorBackend::emitIdiv(GPReg dest)
+{
+    instructionEmitter -> emitInstruction (instIdivReg._opcode, instIdivReg.rmField, dest);
+}
+
+void CodeGeneratorBackend::emitCdqe()
+{
+    instructionEmitter -> emitInstruction (instCdqe._opcode);
 }
 
 void CodeGeneratorBackend::emitRet()

@@ -39,6 +39,12 @@ public:
     Instruction instSetlReg;
     Instruction instSetleReg;
     
+    Instruction instAddRegReg;
+    Instruction instSubRegReg;
+    Instruction instImulReg;
+    Instruction instIdivReg;
+    Instruction instCdqe;
+    
     Instruction instRet;
     
 public:
@@ -62,6 +68,12 @@ public:
     void        emitSetge (GPReg dest);
     void        emitSetl  (GPReg dest);
     void        emitSetle (GPReg dest);
+    
+    void        emitAdd   (GPReg dest, GPReg src);
+    void        emitSub   (GPReg dest, GPReg src);
+    void        emitImul   (GPReg dest);
+    void        emitIdiv  (GPReg dest);
+    void        emitCdqe  ();
     
     void        emitRet   ();
     

@@ -2,6 +2,7 @@
 
 int Decimal (int value)
 { 
+    if (value == 0) return 0;
     std::vector <int> resultValue; 
     
     int result = 0;
@@ -17,6 +18,7 @@ int Decimal (int value)
 
 unsigned char Binary (int value)
 {
+    if (value == 0) return 0;
     std::vector <int> resultValue;
     
     int result = 0;
@@ -58,7 +60,7 @@ bool InstructionEmitter::emitInstruction (opcode _opcode, GPReg dest, GPReg src)
     
     byteData -> emitByte   (BIN(1001000));
     byteData -> emitOpcode (_opcode);
-    byteData -> emitByte   (rmByte);
+    byteData -> emitByte   (Binary (rmByte));
 }
 
 bool InstructionEmitter::emitInstruction (opcode _opcode, GPReg dest, sysint_t src)
@@ -111,6 +113,7 @@ bool InstructionEmitter::emitInstruction(opcode _opcode, sysint_t dest)
     byteData -> emitByte                 (BIN (1001000));
     byteData -> emitOpcode               (_opcode);
     byteData -> emitImmediate <int32_t> (dest);
+    
 }
 
 bool InstructionEmitter::emitInstruction(opcode _opcode, sysuint_t dest)
