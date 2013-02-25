@@ -12,7 +12,18 @@
 class CodeGeneratorBackend
 {
 public:
-    InstructionEmitter* instructionEmitter;
+    InstructionEmitter*    instructionEmitter;
+    
+    std::vector <Label>    createdLabels; 
+    /* ^ Need to create different ID for every label */
+    
+    std::map    <int, int> bindedLabels;  
+    /* ^ Key  - labels ID, 
+     * | Data - number of byte where label stays */
+    
+    std::map    <int, int> labelsToJump;  
+    /* ^ Key  - number of byte where adress have to be written
+     * | Data - ID of label which adress have to be written */
     
     GPReg rax;
     GPReg rcx;
@@ -45,11 +56,15 @@ public:
     Instruction instIdivReg;
     Instruction instCdqe;
     
+    Instruction instJmpReg;
+    
     Instruction instRet;
     
 public:
     CodeGeneratorBackend ();  
    ~CodeGeneratorBackend ();
+   
+    void        setLabelsAdresses (unsigned char *memory);
     
     void        emitMov   (GPReg dest, GPReg     src);
     void        emitMov   (GPReg dest, sysint_t  src);
@@ -71,13 +86,17 @@ public:
     
     void        emitAdd   (GPReg dest, GPReg src);
     void        emitSub   (GPReg dest, GPReg src);
-    void        emitImul   (GPReg dest);
+    void        emitImul  (GPReg dest);
     void        emitIdiv  (GPReg dest);
     void        emitCdqe  ();
     
+    void        emitJmp   (Label dest);
     void        emitRet   ();
     
-    ResFunction make     ();
+    Label       newLabel  ();
+    void        bindLabel (Label label);
+    
+    ResFunction make      ();
 };
 
 #endif

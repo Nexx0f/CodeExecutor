@@ -14,11 +14,16 @@ int main(int argc, char **argv)
     //printf ("\nI quit from the generated function.\n");         
     
     CodeGeneratorBackend assembler;
+
+    Label l1 = assembler.newLabel ();
     
+    assembler.emitMov   (assembler.rax, (sysint_t)141);
+    assembler.emitJmp   (l1);
     assembler.emitMov   (assembler.rax, (sysint_t)4100);
     assembler.emitMov   (assembler.rbx, (sysint_t)-100);
     assembler.emitMov   (assembler.rdx, (sysint_t)0);
     assembler.emitIdiv  (assembler.rbx);
+    assembler.bindLabel (l1);
     assembler.emitRet   ();
     
     ResFunction f = assembler.make();

@@ -9,7 +9,7 @@ typedef std::initializer_list<unsigned char> opcode;
 
 struct Label
 {
-    int cellNumber;
+    int labelId;
 };
 
 

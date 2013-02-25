@@ -35,6 +35,8 @@ CodeGeneratorBackend::CodeGeneratorBackend()
     instIdivReg   = {{0xF7}, 7};
     instCdqe      = {{0x98}, 0};
     
+    instJmpReg    = {{0xFF}, 4};
+    
     instRet       = {{0xC3}, 0};
 }
 
@@ -50,12 +52,41 @@ ResFunction CodeGeneratorBackend::make()
     unsigned char* m = reinterpret_cast <unsigned char*> (memory);
         for (unsigned i = 0; i < instructionEmitter -> byteData -> bytes.size(); i++)
             m[i] = instructionEmitter -> byteData -> bytes [i];
+       
+    setLabelsAdresses (m);    
         
     FILE* dump = fopen ("dump.txt", "wb");
     fwrite (memory, instructionEmitter -> byteData -> bytes.size(), 1, dump);
     fclose (dump);
     
     return reinterpret_cast <ResFunction> (memory);    
+}
+
+Label CodeGeneratorBackend::newLabel()
+{
+    createdLabels.push_back ({createdLabels.size()});
+    return createdLabels [createdLabels.size() - 1]; 
+}
+
+void CodeGeneratorBackend::bindLabel(Label label)
+{
+    bindedLabels [label.labelId] = instructionEmitter -> byteData -> bytes.size();
+}
+
+void CodeGeneratorBackend::setLabelsAdresses(unsigned char* memory)
+{
+    std::map <int, int>::iterator currentAdr;
+    for (currentAdr = labelsToJump.begin(); currentAdr != labelsToJump.end(); currentAdr++)
+    {
+        std::map <int, int>::const_iterator foundLabel = bindedLabels.find (currentAdr -> second);
+        
+        sysuint_t adress = reinterpret_cast <sysuint_t> (&(memory [foundLabel -> second]));
+        
+        for (int i = 0; i < sizeof (sysuint_t); i++)
+        {
+            memory [currentAdr -> first + i] = reinterpret_cast <uint8_t*> (&adress) [i];
+        }
+    }
 }
 
 void CodeGeneratorBackend::emitMov(GPReg dest, GPReg src)
@@ -152,6 +183,13 @@ void CodeGeneratorBackend::emitIdiv(GPReg dest)
 void CodeGeneratorBackend::emitCdqe()
 {
     instructionEmitter -> emitInstruction (instCdqe._opcode);
+}
+
+void CodeGeneratorBackend::emitJmp(Label dest)
+{
+    instructionEmitter -> emitInstruction (instMovRegImm._opcode, rdx, (sysuint_t)0);
+    instructionEmitter -> emitInstruction (instJmpReg._opcode, instJmpReg.rmField, rdx);
+    labelsToJump [instructionEmitter -> byteData -> bytes.size() - 11] = dest.labelId;
 }
 
 void CodeGeneratorBackend::emitRet()
