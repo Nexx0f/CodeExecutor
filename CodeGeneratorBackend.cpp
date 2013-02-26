@@ -35,7 +35,16 @@ CodeGeneratorBackend::CodeGeneratorBackend()
     instIdivReg   = {{0xF7}, 7};
     instCdqe      = {{0x98}, 0};
     
-    instJmpReg    = {{0xFF}, 4};
+    instJmpRel32  = {{0xE9}, 0};
+    instJeRel32   = {{0x0F, 0x84}, 0};
+    instJneRel32  = {{0x0F, 0x85}, 0};
+    instJaRel32   = {{0x0F, 0x87}, 0};
+    instJaeRel32  = {{0x0F, 0x83}, 0};
+    instJbRel32   = {{0x0F, 0x82}, 0};
+    instJbeRel32  = {{0x0F, 0x86}, 0};
+    
+    instCallRel32 = {{0xE8}, 0};
+    instCallReg   = {{0xFF}, 2};
     
     instRet       = {{0xC3}, 0};
 }
@@ -53,8 +62,8 @@ ResFunction CodeGeneratorBackend::make()
         for (unsigned i = 0; i < instructionEmitter -> byteData -> bytes.size(); i++)
             m[i] = instructionEmitter -> byteData -> bytes [i];
        
-    setLabelsAdresses (m);    
-        
+    setLabelsAdresses   (m);   
+    
     FILE* dump = fopen ("dump.txt", "wb");
     fwrite (memory, instructionEmitter -> byteData -> bytes.size(), 1, dump);
     fclose (dump);
@@ -80,119 +89,171 @@ void CodeGeneratorBackend::setLabelsAdresses(unsigned char* memory)
     {
         std::map <int, int>::const_iterator foundLabel = bindedLabels.find (currentAdr -> second);
         
-        sysuint_t adress = reinterpret_cast <sysuint_t> (&(memory [foundLabel -> second]));
+        sysuint_t labelAdress = reinterpret_cast <sysuint_t> (&(memory [foundLabel -> second]));
+        sysuint_t jmpAdress   = reinterpret_cast <sysuint_t> (&(memory [currentAdr -> first]));
         
-        for (int i = 0; i < sizeof (sysuint_t); i++)
+        sysint32_t relativeAdress = labelAdress - jmpAdress;
+        
+        for (int i = 0; i < sizeof (sysint32_t); i++)
         {
-            memory [currentAdr -> first + i] = reinterpret_cast <uint8_t*> (&adress) [i];
+            memory [currentAdr -> first - 4 + i] = reinterpret_cast <uint8_t*> (&relativeAdress) [i];
         }
     }
 }
 
-void CodeGeneratorBackend::emitMov(GPReg dest, GPReg src)
+void CodeGeneratorBackend::emitMov (GPReg dest, GPReg src)
 {
     instructionEmitter -> emitInstruction (instMovRegReg._opcode, dest, src);
 }
 
-void CodeGeneratorBackend::emitMov(GPReg dest, sysint_t src)
+void CodeGeneratorBackend::emitMov (GPReg dest, sysint_t src)
 {
     instructionEmitter -> emitInstruction (instMovRegImm._opcode, dest, src);
 }
 
-void CodeGeneratorBackend::emitMov(GPReg dest, sysuint_t src)
+void CodeGeneratorBackend::emitMov (GPReg dest, sysuint_t src)
 {
     instructionEmitter -> emitInstruction (instMovRegImm._opcode, dest, src);
 }
 
-void CodeGeneratorBackend::emitPush(GPReg dest)
+void CodeGeneratorBackend::emitPush (GPReg dest)
 {
     instructionEmitter -> emitInstruction (instPushReg._opcode, instPushReg.rmField, dest);
 }
 
-void CodeGeneratorBackend::emitPush(sysint_t dest)
+void CodeGeneratorBackend::emitPush (sysint_t dest)
 {
     instructionEmitter -> emitInstruction (instPushImm._opcode, dest);
 }
 
-void CodeGeneratorBackend::emitPush(sysuint_t dest)
+void CodeGeneratorBackend::emitPush (sysuint_t dest)
 {
     instructionEmitter -> emitInstruction (instPushImm._opcode, dest);
 }
 
-void CodeGeneratorBackend::emitPop(GPReg dest)
+void CodeGeneratorBackend::emitPop (GPReg dest)
 {
     instructionEmitter -> emitInstruction (instPopReg._opcode, instPopReg.rmField, dest);
 }
 
-void CodeGeneratorBackend::emitCmp(GPReg dest, GPReg src)
+void CodeGeneratorBackend::emitCmp (GPReg dest, GPReg src)
 {
     instructionEmitter -> emitInstruction (instCmpRegReg._opcode, dest, src);
 }
 
-void CodeGeneratorBackend::emitSete(GPReg dest)
+void CodeGeneratorBackend::emitSete (GPReg dest)
 {
     instructionEmitter -> emitInstruction (instSeteReg._opcode, instSeteReg.rmField, dest);
 }
 
-void CodeGeneratorBackend::emitSetne(GPReg dest)
+void CodeGeneratorBackend::emitSetne (GPReg dest)
 {
     instructionEmitter -> emitInstruction (instSetneReg._opcode, instSetneReg.rmField, dest);
 }
 
-void CodeGeneratorBackend::emitSetg(GPReg dest)
+void CodeGeneratorBackend::emitSetg (GPReg dest)
 {
     instructionEmitter -> emitInstruction (instSetgReg._opcode, instSetgReg.rmField, dest);
 }
 
-void CodeGeneratorBackend::emitSetge(GPReg dest)
+void CodeGeneratorBackend::emitSetge (GPReg dest)
 {
     instructionEmitter -> emitInstruction (instSetgeReg._opcode, instSetgeReg.rmField, dest);
 
 }
 
-void CodeGeneratorBackend::emitSetl(GPReg dest)
+void CodeGeneratorBackend::emitSetl (GPReg dest)
 {
     instructionEmitter -> emitInstruction (instSetlReg._opcode, instSetlReg.rmField, dest);
 }
 
-void CodeGeneratorBackend::emitSetle(GPReg dest)
+void CodeGeneratorBackend::emitSetle (GPReg dest)
 {
     instructionEmitter -> emitInstruction (instSetleReg._opcode, instSetleReg.rmField, dest);
 }
 
-void CodeGeneratorBackend::emitAdd(GPReg dest, GPReg src)
+void CodeGeneratorBackend::emitAdd (GPReg dest, GPReg src)
 {
     instructionEmitter -> emitInstruction (instAddRegReg._opcode, dest, src);
 }
 
-void CodeGeneratorBackend::emitSub(GPReg dest, GPReg src)
+void CodeGeneratorBackend::emitSub (GPReg dest, GPReg src)
 {
     instructionEmitter -> emitInstruction (instSubRegReg._opcode, dest, src);
 }
 
-void CodeGeneratorBackend::emitImul(GPReg dest)
+void CodeGeneratorBackend::emitImul (GPReg dest)
 {
     instructionEmitter -> emitInstruction (instImulReg._opcode, instImulReg.rmField, dest);
 }
 
-void CodeGeneratorBackend::emitIdiv(GPReg dest)
+void CodeGeneratorBackend::emitIdiv (GPReg dest)
 {
     instructionEmitter -> emitInstruction (instIdivReg._opcode, instIdivReg.rmField, dest);
 }
 
-void CodeGeneratorBackend::emitCdqe()
+void CodeGeneratorBackend::emitCdqe ()
 {
     instructionEmitter -> emitInstruction (instCdqe._opcode);
 }
 
-void CodeGeneratorBackend::emitJmp(Label dest)
+void CodeGeneratorBackend::emitJmp (Label dest)
 {
-    instructionEmitter -> emitInstruction (instMovRegImm._opcode, rdx, (sysuint_t)0);
-    instructionEmitter -> emitInstruction (instJmpReg._opcode, instJmpReg.rmField, rdx);
-    labelsToJump [instructionEmitter -> byteData -> bytes.size() - 11] = dest.labelId;
+    instructionEmitter -> emitInstruction (instJmpRel32._opcode, (sysint_t)0);
+    labelsToJump [instructionEmitter -> byteData -> bytes.size()] = dest.labelId;
 }
 
-void CodeGeneratorBackend::emitRet()
+void CodeGeneratorBackend::emitJe (Label dest)
+{
+    instructionEmitter -> emitInstruction (instJeRel32._opcode, (sysint_t)0);
+    labelsToJump [instructionEmitter -> byteData -> bytes.size()] = dest.labelId;
+}
+
+void CodeGeneratorBackend::emitJne (Label dest)
+{
+    instructionEmitter -> emitInstruction (instJneRel32._opcode, (sysint_t)0);
+    labelsToJump [instructionEmitter -> byteData -> bytes.size()] = dest.labelId;
+}
+
+void CodeGeneratorBackend::emitJa (Label dest)
+{
+    instructionEmitter -> emitInstruction (instJaRel32._opcode, (sysint_t)0);
+    labelsToJump [instructionEmitter -> byteData -> bytes.size()] = dest.labelId;
+}
+
+void CodeGeneratorBackend::emitJae (Label dest)
+{
+    instructionEmitter -> emitInstruction (instJaeRel32._opcode, (sysint_t)0);
+    labelsToJump [instructionEmitter -> byteData -> bytes.size()] = dest.labelId;
+}
+
+void CodeGeneratorBackend::emitJb (Label dest)
+{
+    instructionEmitter -> emitInstruction (instJbRel32._opcode, (sysint_t)0);
+    labelsToJump [instructionEmitter -> byteData -> bytes.size()] = dest.labelId;
+}
+
+void CodeGeneratorBackend::emitJbe (Label dest)
+{
+    instructionEmitter -> emitInstruction (instJbeRel32._opcode, (sysint_t)0);
+    labelsToJump [instructionEmitter -> byteData -> bytes.size()] = dest.labelId;
+}
+
+void CodeGeneratorBackend::emitCall(void* dest)
+{
+    instructionEmitter -> emitInstruction (instMovRegImm._opcode, rdx, reinterpret_cast <sysuint_t> (dest));
+    instructionEmitter -> emitInstruction (instCallReg._opcode, instCallReg.rmField, rdx);
+    //instructionEmitter -> emitInstruction (instCallRel32._opcode, (sysint32_t)0);
+    //adressesToJump [instructionEmitter -> byteData -> bytes.size()] = dest;
+}
+
+void CodeGeneratorBackend::emitCall(Label dest)
+{
+    instructionEmitter -> emitInstruction (instCallRel32._opcode, (sysint_t)0);
+    labelsToJump [instructionEmitter -> byteData -> bytes.size()] = dest.labelId;
+}
+
+void CodeGeneratorBackend::emitRet ()
 {
     instructionEmitter -> emitInstruction (instRet._opcode);
 }

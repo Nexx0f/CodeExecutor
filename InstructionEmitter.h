@@ -43,8 +43,9 @@ public:
     bool emitInstruction (opcode _opcode, GPReg dest,  sysuint_t src);
     
     bool emitInstruction (opcode _opcode, int rmField, GPReg dest);
-    bool emitInstruction (opcode _opcode, sysint_t dest);
-    bool emitInstruction (opcode _opcode, sysuint_t dest);
+    bool emitInstruction (opcode _opcode, sysint_t   dest);
+    bool emitInstruction (opcode _opcode, sysuint_t  dest);
+    bool emitInstruction (opcode _opcode, sysint32_t dest);
     
     bool emitInstruction (opcode _opcode);
 };

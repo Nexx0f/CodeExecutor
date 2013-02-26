@@ -108,19 +108,25 @@ bool InstructionEmitter::emitInstruction (opcode _opcode, int rmField, GPReg des
     byteData -> emitByte   (Binary (rmByte));
 }
 
-bool InstructionEmitter::emitInstruction(opcode _opcode, sysint_t dest)
+bool InstructionEmitter::emitInstruction (opcode _opcode, sysint_t dest)
 {
     byteData -> emitByte                 (BIN (1001000));
     byteData -> emitOpcode               (_opcode);
-    byteData -> emitImmediate <int32_t> (dest);
-    
+    byteData -> emitImmediate <int32_t>  (dest);
 }
 
-bool InstructionEmitter::emitInstruction(opcode _opcode, sysuint_t dest)
+bool InstructionEmitter::emitInstruction (opcode _opcode, sysuint_t dest)
 {
     byteData -> emitByte                 (BIN (1001000));
     byteData -> emitOpcode               (_opcode);
     byteData -> emitImmediate <uint32_t> (dest);
+}
+
+bool InstructionEmitter::emitInstruction(opcode _opcode, sysint32_t dest)
+{
+    byteData -> emitByte                    (BIN (1001000));
+    byteData -> emitOpcode                  (_opcode);
+    byteData -> emitImmediate <sysint32_t>  (dest);
 }
 
 bool InstructionEmitter::emitInstruction (opcode _opcode)
