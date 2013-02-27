@@ -1,20 +1,20 @@
 project(codeexecutor)
 
-Set(ASMJIT_SOURCES
-  AsmJit/AssemblerX86X64.cpp
-  AsmJit/CodeGenerator.cpp
-  AsmJit/Compiler.cpp
-  AsmJit/CompilerX86X64.cpp
-  AsmJit/CpuInfo.cpp
-  AsmJit/Defs.cpp
-  AsmJit/DefsX86X64.cpp
-  AsmJit/Logger.cpp
-  AsmJit/MemoryManager.cpp
-  AsmJit/MemoryMarker.cpp
-  AsmJit/OperandX86X64.cpp
-  AsmJit/Platform.cpp
-  AsmJit/Util.cpp
-)
+# Set(ASMJIT_SOURCES
+#   AsmJit/AssemblerX86X64.cpp
+#   AsmJit/CodeGenerator.cpp
+#   AsmJit/Compiler.cpp
+#   AsmJit/CompilerX86X64.cpp
+#   AsmJit/CpuInfo.cpp
+#   AsmJit/Defs.cpp
+#   AsmJit/DefsX86X64.cpp
+#   AsmJit/Logger.cpp
+#   AsmJit/MemoryManager.cpp
+#   AsmJit/MemoryMarker.cpp
+#   AsmJit/OperandX86X64.cpp
+#   AsmJit/Platform.cpp
+#   AsmJit/Util.cpp
+# )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 

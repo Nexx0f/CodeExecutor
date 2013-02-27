@@ -1,22 +1,26 @@
-#include "AsmJit/AsmJit.h"
+//#include "AsmJit/AsmJit.h"
+#include "CodeGeneratorBackend.h"
 #include <map>
 
-typedef AsmJit::GPReg reg;
-typedef AsmJit::Label label;
+//typedef AsmJit::GPReg reg;
+//typedef AsmJit::Label label;
+typedef GPReg reg;
+typedef Label label;
 
 class JitPlatform
 {
 public:
-    AsmJit::Assembler* compiler;
+    CodeGeneratorBackend* compiler;
             
     int cmdsAmount;
     
-    const reg&  rax;
-    const reg&  rbx;
-    const reg&  rsp;
-    const reg&  rsi;
-    const reg&  rdi;
-    const reg&  rbp;
+    reg  rax;
+    reg  rbx;
+    reg  rdx;
+    reg  rsp;
+    reg  rsi;
+    reg  rdi;
+    reg  rbp;
     
     std::map <int, const char*> regNames;
     

@@ -113,7 +113,7 @@ static int pushValueToPointer (const char* name, sysint_t newValue)
 
 bool JitCompiler::Push ()
 {
-    compiler -> push (execCmds[executingCmd] -> intArgs [0]);
+    compiler -> push ((sysint_t)execCmds[executingCmd] -> intArgs [0]);
 }
 
 bool JitCompiler::Label ()
@@ -415,5 +415,5 @@ resultFunction JitCompiler::Execute()
     printf ("\nAmount of commands and amount after translating ratio: %d/%d\n",
             execCmds.size(), compiler -> cmdsAmount);
     
-    return AsmJit::function_cast <resultFunction> (compiler -> compiler -> make ());
+    return compiler -> compiler -> make ();
 }
